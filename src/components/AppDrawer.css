@@ -1,0 +1,79 @@
+.app-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  min-height: 0;
+}
+
+.app-drawer__viewport {
+  flex: 1;
+  min-height: 0;
+  /* Room for clay shadows so they aren't clipped. */
+  margin: calc(-1 * var(--space-5));
+  padding: var(--space-5);
+  overflow: hidden;
+}
+
+.app-drawer__track {
+  display: flex;
+  height: 100%;
+  transition: transform 420ms var(--ease-squish);
+}
+
+.app-drawer__page {
+  container-type: size;
+  flex: 0 0 100%;
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+/* Grid keeps 4×3 cells square-ish and as large as the available space allows. */
+.app-drawer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(var(--space-3), 3cqmin, var(--space-6));
+  width: min(100cqw, 133.333cqh);
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-drawer__grid li {
+  min-width: 0;
+  min-height: 0;
+}
+
+.app-drawer__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.app-drawer__dot {
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-text-muted) 55%, var(--color-bg));
+  box-shadow: var(--clay-shadow-inset);
+  cursor: pointer;
+  transition:
+    width var(--duration-base) var(--ease-squish),
+    background-color var(--duration-base) ease;
+}
+
+.app-drawer__dot[aria-current="page"] {
+  width: 32px;
+  background: var(--color-primary);
+  box-shadow: var(--clay-shadow-primary);
+}
+
+.app-drawer__empty {
+  margin: auto;
+  color: var(--color-text-muted);
+}

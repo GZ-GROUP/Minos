@@ -1,0 +1,116 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color var(--duration-base) ease,
+    color var(--duration-base) ease;
+  user-select: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Shared clay surface + button primitives */
+.clay {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--clay-shadow);
+}
+
+.clay-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-squish),
+    box-shadow var(--duration-fast) ease;
+}
+
+.clay-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--clay-shadow-hover);
+}
+
+.clay-button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+.clay-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--clay-shadow);
+}
+
+.clay-button--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--clay-shadow-primary);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

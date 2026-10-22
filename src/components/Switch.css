@@ -1,0 +1,47 @@
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 56px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  box-shadow: var(--clay-shadow-inset);
+  cursor: pointer;
+  transition: background-color var(--duration-base) ease;
+}
+
+.switch[aria-checked="true"] {
+  background: var(--color-primary);
+}
+
+.switch__knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow);
+  transition: transform var(--duration-base) var(--ease-squish);
+}
+
+.switch[aria-checked="true"] .switch__knob {
+  transform: translateX(24px);
+  background: var(--color-light);
+}
+
+.switch:hover .switch__knob {
+  box-shadow: var(--clay-shadow-hover);
+}
+
+.switch:active .switch__knob {
+  width: 28px;
+}
+
+.switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

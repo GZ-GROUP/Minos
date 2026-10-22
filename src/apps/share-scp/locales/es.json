@@ -1,0 +1,4 @@
+{
+  "name": "Compartir por SCP",
+  "description": "Copia archivos a un servidor remoto usando SCP."
+}

@@ -1,0 +1,34 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  gap: var(--space-5);
+}
+
+.shell__header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  /* Extend the drag area to the window edges. */
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-6)) 0;
+  padding: var(--space-4) var(--space-4) 0 var(--space-6);
+}
+
+.shell__title {
+  font-size: var(--text-xl);
+  letter-spacing: 0.02em;
+  cursor: default;
+}
+
+.shell__drag-spacer {
+  flex: 1;
+  align-self: stretch;
+}
+
+.shell__main {
+  flex: 1;
+  min-height: 0;
+}

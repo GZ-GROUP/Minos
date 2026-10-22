@@ -1,0 +1,118 @@
+.app-menu {
+  position: relative;
+}
+
+.app-menu__trigger {
+  display: block;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-secondary);
+  box-shadow: var(--clay-shadow);
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-squish),
+    box-shadow var(--duration-fast) ease;
+}
+
+.app-menu__trigger img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.app-menu__trigger:hover {
+  transform: translateY(-2px) rotate(-3deg);
+  box-shadow: var(--clay-shadow-hover);
+}
+
+.app-menu__trigger:active,
+.app-menu__trigger[aria-expanded="true"] {
+  transform: scale(0.96);
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+.app-menu__panel {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 300px;
+  padding: var(--space-3);
+  transform-origin: top left;
+  animation: menu-pop var(--duration-base) var(--ease-squish);
+}
+
+.app-menu__panel[hidden] {
+  display: none;
+}
+
+.app-menu__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+
+.app-menu__row--action {
+  width: 100%;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-squish),
+    box-shadow var(--duration-fast) ease;
+}
+
+.app-menu__row--action:hover {
+  box-shadow: var(--clay-shadow);
+  transform: translateY(-1px);
+}
+
+.app-menu__row--action:active {
+  box-shadow: var(--clay-shadow-pressed);
+  transform: translateY(1px);
+}
+
+.app-menu__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.app-menu__label svg {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: var(--color-icon);
+}
+
+.app-menu__chevron {
+  width: 18px;
+  height: 18px;
+  color: var(--color-icon);
+}
+
+@keyframes menu-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

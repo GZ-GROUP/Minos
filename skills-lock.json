@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "claymorphism": {
+      "source": "bergside/awesome-design-skills",
+      "sourceType": "github",
+      "skillPath": "skills/claymorphism/SKILL.md",
+      "computedHash": "ec2fd923cd2e389006b2ac2798bd832a56f9f0f99c9bd729758b9f17e0bbbc5d"
+    }
+  }
+}

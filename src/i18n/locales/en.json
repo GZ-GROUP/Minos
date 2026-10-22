@@ -1,0 +1,37 @@
+{
+  "appName": "Minos",
+  "menu": {
+    "open": "Open menu",
+    "darkMode": "Dark mode",
+    "language": "Language",
+    "about": "About"
+  },
+  "about": {
+    "title": "About Minos",
+    "version": "Version {{version}}",
+    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Cras mattis consectetur purus sit amet fermentum.",
+    "close": "Close"
+  },
+  "drawer": {
+    "label": "Apps",
+    "page": "Page {{page}} of {{total}}",
+    "previous": "Previous page",
+    "next": "Next page",
+    "empty": "No apps installed yet."
+  },
+  "appView": {
+    "back": "Back",
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "This tool is not available yet. Check back in a future version."
+  },
+  "languages": {
+    "en": "English",
+    "es": "Spanish"
+  },
+  "window": {
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close"
+  }
+}

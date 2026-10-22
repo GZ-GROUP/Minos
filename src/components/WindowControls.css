@@ -1,0 +1,46 @@
+.window-controls {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.window-controls__button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  box-shadow: var(--clay-shadow);
+  color: var(--color-icon);
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-squish),
+    box-shadow var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.window-controls__button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.window-controls__button:hover {
+  transform: translateY(-2px);
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow-hover);
+}
+
+.window-controls__button:active {
+  transform: translateY(1px) scale(0.95);
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+.window-controls__button--close:hover,
+.window-controls__button--close:active {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+  box-shadow: var(--clay-shadow-primary);
+}

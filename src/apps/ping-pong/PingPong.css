@@ -1,0 +1,40 @@
+.ping-pong {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+  min-height: 0;
+}
+
+.ping-pong__toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 170px auto;
+  align-items: start;
+  gap: var(--space-3) var(--space-4);
+}
+
+/* Lines the button up with the inputs (skips the label row: text-sm × line-height + gap). */
+.ping-pong__action {
+  display: flex;
+  padding-top: calc(var(--text-sm) * 1.5 + var(--space-2));
+}
+
+.ping-pong__action .button {
+  height: 44px;
+  min-width: 120px;
+}
+
+@media (max-width: 760px) {
+  .ping-pong__toolbar {
+    grid-template-columns: minmax(0, 1fr) 150px;
+  }
+
+  .ping-pong__action {
+    grid-column: 1 / -1;
+    padding-top: 0;
+  }
+
+  .ping-pong__action .button {
+    flex: 1;
+  }
+}

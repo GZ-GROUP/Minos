@@ -1,4 +1,15 @@
 {
   "name": "Recortar PDF",
-  "description": "Recorta márgenes o extrae páginas de un PDF."
+  "description": "Conserva solo las páginas que necesitas de un PDF.",
+  "choose": "Elige un PDF",
+  "pages": "Páginas a conservar",
+  "placeholder": "p. ej. 1-5, 8, 11-13",
+  "hintEmpty": "Rangos y páginas sueltas, separados por comas.",
+  "hintPages_one": "El documento tiene {{count}} página.",
+  "hintPages_other": "El documento tiene {{count}} páginas.",
+  "selected_one": "Se conservará {{count}} página.",
+  "selected_other": "Se conservarán {{count}} páginas.",
+  "crop": "Recortar PDF",
+  "invalid": "Usa números de página y rangos como 1-5, 8, 11-13.",
+  "outOfRange": "La página {{page}} no existe (el documento tiene {{total}})."
 }

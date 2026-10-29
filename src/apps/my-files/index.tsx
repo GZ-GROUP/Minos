@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { isTauri } from "@tauri-apps/api/core";
-import { ArrowClockwise, FilePlus, FolderPlus, PencilSimple, Trash } from "@phosphor-icons/react";
+import { ArrowClockwise, FilePlus, FolderPlus, PencilSimple, ShieldCheck, Trash } from "@phosphor-icons/react";
 import { Button } from "../../components/Button";
 import { StateMessage } from "../../components/StateMessage";
 import { Switch } from "../../components/Switch";
@@ -10,6 +10,7 @@ import { useDialogs } from "../../components/dialogs/DialogProvider";
 import type { FormValues } from "../../components/dialogs/InputBox";
 import { NOT_AVAILABLE } from "../../hooks/useCommand";
 import { errorCode, files, validateName, type Listing } from "./api";
+import { PermissionsDialog } from "./PermissionsDialog";
 import "./MyFiles.css";
 
 export default function MyFiles() {
@@ -25,6 +26,7 @@ export default function MyFiles() {
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
+  const [permissionsFor, setPermissionsFor] = useState<TreeEntry | null>(null);
   const requestId = useRef(0);
 
   const describe = useCallback(
@@ -197,8 +199,21 @@ export default function MyFiles() {
           >
             {t("actions.delete")}
           </Button>
+          {/* Permissions apply to files only (see files_set_permissions). */}
+          <Button
+            icon={ShieldCheck}
+            disabled={selectedEntry?.kind !== "file"}
+            title={selectedEntry?.kind === "folder" ? t("permissions.filesOnly") : undefined}
+            onClick={() => selectedEntry && setPermissionsFor(selectedEntry)}
+          >
+            {t("actions.permissions")}
+          </Button>
         </div>
       </div>
+
+      {home && permissionsFor && (
+        <PermissionsDialog home={home} entry={permissionsFor} onClose={() => setPermissionsFor(null)} />
+      )}
 
       {home && (
         <Tree

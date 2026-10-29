@@ -1,4 +1,14 @@
 {
   "name": "Compartir por red",
-  "description": "Envía archivos a dispositivos de tu red local."
+  "description": "Comparte un archivo con dispositivos de tu red mediante un enlace o un código QR.",
+  "choose": "Elige un archivo para compartir",
+  "start": "Empezar a compartir",
+  "stop": "Dejar de compartir",
+  "sharing_one": "Compartiendo · {{count}} descarga",
+  "sharing_other": "Compartiendo · {{count}} descargas",
+  "qrLabel": "Código QR con el enlace de descarga",
+  "link": "Enlace de descarga",
+  "copy": "Copiar enlace",
+  "hint": "Abre el enlace o escanea el código desde un dispositivo en la misma red. La primera vez, el firewall puede pedir permiso para Minos.",
+  "idle": "Elige un archivo y empieza a compartir para obtener un enlace y un código QR."
 }

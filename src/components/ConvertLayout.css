@@ -1,0 +1,81 @@
+.convert {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  /* Room for clay shadows at the scroll edges. */
+  padding: var(--space-1) var(--space-2) var(--space-4);
+}
+
+.convert__notice {
+  display: flex;
+  justify-content: center;
+}
+
+.convert__flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.convert__slot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Puffy clay arrow between the two slots. */
+.convert__arrow {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow);
+  color: var(--color-icon);
+}
+
+.convert__arrow svg {
+  width: 24px;
+  height: 24px;
+}
+
+.convert__controls {
+  display: flex;
+  justify-content: center;
+}
+
+.convert__controls > * {
+  width: min(420px, 100%);
+}
+
+.convert__action {
+  display: flex;
+  justify-content: center;
+}
+
+.convert__action .button {
+  min-width: 200px;
+}
+
+/* Narrow: stack vertically and point the arrow down. */
+@container (max-width: 560px) {
+  .convert__flow {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .convert__slot {
+    width: 100%;
+  }
+
+  .convert__arrow svg {
+    transform: rotate(90deg);
+  }
+}

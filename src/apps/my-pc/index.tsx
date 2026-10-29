@@ -1,7 +1,15 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { AppleLogo, Desktop, LinuxLogo, WindowsLogo, type Icon } from "@phosphor-icons/react";
+import { invoke } from "@tauri-apps/api/core";
+import { documentDir, join } from "@tauri-apps/api/path";
+import { save } from "@tauri-apps/plugin-dialog";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import { AppleLogo, Camera, CheckCircle, Desktop, LinuxLogo, WindowsLogo, type Icon } from "@phosphor-icons/react";
+import { Button } from "../../components/Button";
 import { RefreshButton } from "../../components/RefreshButton";
+import { useDialogs } from "../../components/dialogs/DialogProvider";
+import { describeError } from "../../lib/errors";
+import { buildReport, type DiskInfo, type NetworkAdapter } from "./report";
 import { StateMessage } from "../../components/StateMessage";
 import { UsageBar } from "../../components/UsageBar";
 import { useCommand } from "../../hooks/useCommand";
@@ -45,9 +53,59 @@ const SWATCHES = [
   "--color-text-muted",
 ];
 
+const pad = (value: number) => String(value).padStart(2, "0");
+
+/** e.g. minos-snapshot-2026-10-28-2141.txt */
+function snapshotName(date: Date): string {
+  const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  return `minos-snapshot-${day}-${pad(date.getHours())}${pad(date.getMinutes())}.txt`;
+}
+
 export default function MyPc() {
   const { t } = useTranslation("my-pc");
+  const { t: tCommon } = useTranslation();
+  const { confirm, alert } = useDialogs();
   const { data, error, loading, refreshing, refresh } = useCommand<PcInfo>("my_pc_info");
+  const [saving, setSaving] = useState(false);
+
+  /** Saves a TXT report (this PC + disks + network) where the user chooses. */
+  const snapshot = async () => {
+    const now = new Date();
+    let defaultPath = snapshotName(now);
+    try {
+      defaultPath = await join(await documentDir(), defaultPath);
+    } catch {
+      // No Documents folder: the dialog opens in its default location.
+    }
+    const chosen = await save({ defaultPath, filters: [{ name: t("report.fileType"), extensions: ["txt"] }] });
+    if (!chosen) return;
+    const destination = /.txt$/i.test(chosen) ? chosen : `${chosen}.txt`;
+
+    setSaving(true);
+    try {
+      const [pc, disks, adapters] = await Promise.all([
+        invoke<PcInfo>("my_pc_info"),
+        invoke<DiskInfo[]>("disks_list"),
+        invoke<NetworkAdapter[]>("network_adapters"),
+      ]);
+      await invoke("report_save", { path: destination, content: buildReport(t, { pc, disks, adapters }, now) });
+      setSaving(false);
+      const choice = await confirm({
+        icon: CheckCircle,
+        title: t("snapshotSaved"),
+        message: destination,
+        options: [
+          { id: "show", label: t("showInFolder") },
+          { id: "ok", label: tCommon("dialog.ok"), variant: "primary" },
+        ],
+        defaultOption: "ok",
+      });
+      if (choice === "show") revealItemInDir(destination).catch(() => {});
+    } catch (cause) {
+      setSaving(false);
+      await alert({ tone: "danger", title: tCommon("errors.title"), message: describeError(cause) });
+    }
+  };
 
   if (loading && !data) return <StateMessage kind="loading" />;
   if (error && !data) return <StateMessage kind="error" error={error} />;
@@ -144,6 +202,13 @@ export default function MyPc() {
           ))}
         </div>
       </article>
+
+      <div className="my-pc__footer">
+        <Button variant="primary" icon={Camera} loading={saving} onClick={snapshot}>
+          {t("snapshot")}
+        </Button>
+        <p className="my-pc__hint">{t("snapshotHint")}</p>
+      </div>
     </div>
   );
 }

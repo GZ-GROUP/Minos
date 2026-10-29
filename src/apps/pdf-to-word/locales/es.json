@@ -1,4 +1,6 @@
 {
   "name": "PDF a Word",
-  "description": "Convierte documentos PDF en archivos de Word editables."
+  "description": "Convierte documentos PDF en archivos de Word editables.",
+  "choose": "Elige un PDF",
+  "convert": "Convertir a Word"
 }

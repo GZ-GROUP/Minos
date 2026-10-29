@@ -1,4 +1,12 @@
 {
   "name": "Juntar PDF",
-  "description": "Combina varios PDF en un solo archivo."
+  "description": "Combina varios PDF en un solo archivo.",
+  "choose": "Elige los PDF a unir",
+  "order": "Orden de unión",
+  "add": "Agregar PDF",
+  "moveUp": "Subir {{name}}",
+  "moveDown": "Bajar {{name}}",
+  "needTwo": "Agrega al menos dos PDF",
+  "merge_one": "Unir {{count}} PDF",
+  "merge_other": "Unir {{count}} PDF"
 }

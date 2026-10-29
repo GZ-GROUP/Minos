@@ -16,6 +16,8 @@ interface DialogProps {
   align?: "start" | "center";
   children?: ReactNode;
   actions?: ReactNode;
+  /** Small print under the actions, separated by a divider (links, version…). */
+  footer?: ReactNode;
   /** Wraps the content in a form so Enter submits it. */
   onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
 }
@@ -34,6 +36,7 @@ export function Dialog({
   align = "start",
   children,
   actions,
+  footer,
   onSubmit,
 }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -61,6 +64,7 @@ export function Dialog({
       </header>
       {children && <div className="dialog__body">{children}</div>}
       {actions && <footer className="dialog__actions">{actions}</footer>}
+      {footer && <div className="dialog__footer">{footer}</div>}
     </>
   );
 

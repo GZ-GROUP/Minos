@@ -1,0 +1,22 @@
+{
+  "name": "PingPong!",
+  "description": "Check whether a device answers on the network.",
+  "host": "IP address or host",
+  "placeholder": "192.168.100.10 or example.com",
+  "count": "Pings",
+  "ping": "Ping",
+  "stop": "Stop",
+  "console": "Ping output",
+  "consolePlaceholder": "Enter an address and press Ping to see the reply here.",
+  "invalidHost": "Enter a valid IP address or host name (letters, numbers, dots and hyphens).",
+  "started": "▶ ping {{host}} · {{count}} packets",
+  "finished": "✓ Finished · exit code {{code}}",
+  "failedLine": "✗ The host didn’t reply to every ping · exit code {{code}}",
+  "stoppedLine": "■ Stopped",
+  "status": {
+    "running": "Running",
+    "ok": "Replied",
+    "failed": "No reply",
+    "stopped": "Stopped"
+  }
+}

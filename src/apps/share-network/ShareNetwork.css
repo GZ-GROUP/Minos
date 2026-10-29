@@ -1,0 +1,82 @@
+.share-network {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: start;
+  gap: var(--space-5);
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-1) var(--space-2) var(--space-4);
+}
+
+.share-network__file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.share-network__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 230px;
+  padding: var(--space-5);
+}
+
+/* White card around the QR so it scans in dark mode too. */
+.share-network__qr {
+  display: grid;
+  place-items: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  box-shadow: var(--clay-shadow-sm);
+  line-height: 0;
+}
+
+.share-network__qr svg {
+  width: 200px;
+  height: 200px;
+}
+
+.share-network__url {
+  width: 100%;
+}
+
+.share-network__url .text-field__input {
+  font-family: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  font-size: var(--text-sm);
+}
+
+.share-network__hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.share-network__idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  flex: 1;
+  max-width: 320px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.share-network__idle svg {
+  width: 48px;
+  height: 48px;
+  color: var(--color-icon);
+}
+
+@container (max-width: 640px) {
+  .share-network {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

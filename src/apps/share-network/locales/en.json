@@ -1,4 +1,14 @@
 {
   "name": "Share over Network",
-  "description": "Send files to devices on your local network."
+  "description": "Share a file with devices on your network using a link or QR code.",
+  "choose": "Choose a file to share",
+  "start": "Start sharing",
+  "stop": "Stop sharing",
+  "sharing_one": "Sharing · {{count}} download",
+  "sharing_other": "Sharing · {{count}} downloads",
+  "qrLabel": "QR code with the download link",
+  "link": "Download link",
+  "copy": "Copy link",
+  "hint": "Open the link or scan the code from a device on the same network. Your firewall may ask to allow Minos the first time.",
+  "idle": "Choose a file and start sharing to get a link and a QR code."
 }

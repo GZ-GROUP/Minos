@@ -1,0 +1,53 @@
+/* Builds on .text-field (TextField.css): only the steppers and centered value are new. */
+.numeric-updown__control {
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+}
+
+.numeric-updown__input {
+  width: 100%;
+  min-width: 2.5ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* Small raised clay buttons inside the sunken groove. */
+.numeric-updown__step {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow-sm);
+  color: var(--color-icon);
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-squish),
+    box-shadow var(--duration-fast) ease,
+    opacity var(--duration-fast) ease;
+}
+
+.numeric-updown__step svg {
+  width: 14px;
+  height: 14px;
+}
+
+.numeric-updown__step:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--clay-shadow-sm-hover);
+}
+
+.numeric-updown__step:active:not(:disabled) {
+  transform: scale(0.92);
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+.numeric-updown__step:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

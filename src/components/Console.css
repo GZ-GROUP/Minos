@@ -1,0 +1,178 @@
+/* The screen is black in both themes, so it has its own palette instead of theme tokens. */
+.console {
+  --console-bg: #0d0a0c;
+  --console-text: #fee8be;
+  --console-muted: rgba(254, 232, 190, 0.45);
+  --console-err: #f87171;
+  --console-info: #f0915f;
+  --console-success: #4ade80;
+  --console-font: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-3);
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.console__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 32px;
+  padding: 0 var(--space-1) 0 var(--space-2);
+}
+
+/* Window dots, as small clay beads. */
+.console__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.console__dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow:
+    inset -2px -2px 3px rgba(0, 0, 0, 0.18),
+    inset 2px 2px 3px rgba(255, 255, 255, 0.45);
+}
+
+.console__dots span:nth-child(1) {
+  background: var(--color-danger);
+}
+
+.console__dots span:nth-child(2) {
+  background: var(--color-warning);
+}
+
+.console__dots span:nth-child(3) {
+  background: var(--color-success);
+}
+
+.console__title {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.console__status {
+  display: flex;
+  margin-left: auto;
+}
+
+.console__actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* ── Screen ──────────────────────────────────────────────── */
+
+.console__screen {
+  --scrollbar-thumb: rgba(254, 232, 190, 0.22);
+  --scrollbar-thumb-hover: rgba(254, 232, 190, 0.4);
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--console-bg);
+  box-shadow:
+    inset 5px 5px 12px rgba(0, 0, 0, 0.7),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.05);
+  color: var(--console-text);
+  font-family: var(--console-font);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.console__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-4) var(--space-5);
+  cursor: text;
+  user-select: text;
+}
+
+.console__scroll:focus-visible {
+  /* Inside a clipping parent: draw the ring inward so it stays visible. */
+  outline: var(--focus-ring);
+  outline-offset: -3px;
+  border-radius: var(--radius-md);
+}
+
+.console__screen ::selection {
+  background: rgba(220, 102, 45, 0.5);
+  color: #ffffff;
+}
+
+.console__line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.console__line[data-kind="err"] {
+  color: var(--console-err);
+}
+
+.console__line[data-kind="info"] {
+  color: var(--console-info);
+  font-weight: 700;
+}
+
+.console__line[data-kind="success"] {
+  color: var(--console-success);
+  font-weight: 700;
+}
+
+.console__placeholder {
+  color: var(--console-muted);
+}
+
+.console__prompt {
+  color: var(--console-info);
+  font-weight: 700;
+}
+
+/* Block cursor while output is streaming. */
+.console__cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  margin-top: 2px;
+  background: var(--console-text);
+  vertical-align: text-bottom;
+  animation: console-blink 1s steps(1) infinite;
+}
+
+@keyframes console-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Interactive prompt line */
+.console__input-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+}
+
+.console__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--console-text);
+  caret-color: var(--console-info);
+  font: inherit;
+  outline: none;
+}

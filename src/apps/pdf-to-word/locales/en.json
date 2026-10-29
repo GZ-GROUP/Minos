@@ -1,4 +1,6 @@
 {
   "name": "PDF to Word",
-  "description": "Convert PDF documents into editable Word files."
+  "description": "Convert PDF documents into editable Word files.",
+  "choose": "Choose a PDF",
+  "convert": "Convert to Word"
 }

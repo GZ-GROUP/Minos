@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { PencilSimple, WarningCircle, type Icon } from "@phosphor-icons/react";
 import { Button } from "../Button";
+import { TextField } from "../TextField";
 import { Dialog } from "./Dialog";
 
 export type FormValues = Record<string, string>;
@@ -48,7 +49,6 @@ export function InputBox({ options, onResolve }: InputBoxProps) {
   const [submitting, setSubmitting] = useState(false);
   const firstInput = useRef<HTMLInputElement>(null);
   const baseId = useId();
-  const errorId = `${baseId}-error`;
 
   // Focus + selection once the dialog is shown (showModal moves focus first).
   useEffect(() => {
@@ -104,34 +104,26 @@ export function InputBox({ options, onResolve }: InputBoxProps) {
       }
     >
       {message && <p>{message}</p>}
-      {fields.map((field, index) => {
-        const id = `${baseId}-${field.name}`;
-        return (
-          <div key={field.name} className="dialog-field">
-            <label htmlFor={id} className="dialog-field__label">
-              {field.label}
-            </label>
-            <input
-              ref={index === 0 ? firstInput : undefined}
-              id={id}
-              className="dialog-field__input"
-              type={field.type ?? "text"}
-              value={values[field.name]}
-              placeholder={field.placeholder}
-              autoComplete="off"
-              spellCheck={false}
-              aria-invalid={error ? true : undefined}
-              aria-describedby={error ? errorId : undefined}
-              onChange={(event) => {
-                setValues((current) => ({ ...current, [field.name]: event.target.value }));
-                setError(null);
-              }}
-            />
-          </div>
-        );
-      })}
-      {error && (
-        <p id={errorId} className="dialog-error" role="alert">
+      {fields.map((field, index) => (
+        <TextField
+          key={field.name}
+          ref={index === 0 ? firstInput : undefined}
+          id={`${baseId}-${field.name}`}
+          label={field.label}
+          type={field.type ?? "text"}
+          value={values[field.name]}
+          placeholder={field.placeholder}
+          // Single-field prompts show the error on the field; forms show it below all fields.
+          error={fields.length === 1 ? error : undefined}
+          aria-invalid={error ? true : undefined}
+          onChange={(value) => {
+            setValues((current) => ({ ...current, [field.name]: value }));
+            setError(null);
+          }}
+        />
+      ))}
+      {error && fields.length > 1 && (
+        <p className="dialog-error" role="alert">
           <WarningCircle weight="bold" aria-hidden="true" />
           {error}
         </p>

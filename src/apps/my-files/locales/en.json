@@ -6,7 +6,8 @@
     "newFolder": "New folder",
     "rename": "Rename",
     "delete": "Delete",
-    "create": "Create"
+    "create": "Create",
+    "permissions": "Permissions"
   },
   "showHidden": "Show hidden",
   "fields": {
@@ -44,5 +45,25 @@
     "outside_home": "That location is outside your home folder.",
     "not_empty": "The folder isn’t empty.",
     "io": "The operation couldn’t be completed."
+  },
+  "permissions": {
+    "title": "Permissions",
+    "message": "Choose what you can do with “{{name}}”.",
+    "current": "Current access:",
+    "readable": "Readable",
+    "notReadable": "Not readable",
+    "writable": "Writable",
+    "readOnly": "Read-only",
+    "executable": "Executable",
+    "notExecutable": "Not executable",
+    "read": "Read",
+    "readHint": "Without it, the file’s content can’t be opened or viewed.",
+    "write": "Write",
+    "writeHint": "Without it, the file can’t be modified or saved.",
+    "execute": "Execute",
+    "executeHint": "Allows running the file as a program or script.",
+    "apply": "Apply",
+    "applied": "Permissions updated. The current access above was checked again.",
+    "filesOnly": "Permissions can only be edited on files."
   }
 }

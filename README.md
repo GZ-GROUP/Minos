@@ -14,17 +14,20 @@ Minos is a desktop app that bundles small everyday tools (PDF conversion, file s
 
 | Tool | Status |
 | --- | --- |
-| PDF to Word | Planned |
-| Word to PDF | Planned |
-| Crop PDF | Planned |
-| Merge PDF | Planned |
-| Share over Network | Planned |
-| Share over SCP | Planned |
+| PDF to Word | Available |
+| Word to PDF | Available |
+| Crop PDF | Available |
+| Merge PDF | Available |
+| Share over Network | Available |
+| Share over SCP | Available |
 | Processes | Available |
 | My PC | Available |
 | My Network | Available |
 | My Disks | Available |
 | My Files | Available |
+| PingPong! | Available |
+
+PDF ↔ Word conversion uses [LibreOffice](https://www.libreoffice.org/) when it is installed (full formatting); without it Minos falls back to a built-in converter that keeps the text only.
 
 ## Adding a tool
 

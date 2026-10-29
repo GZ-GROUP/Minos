@@ -12,6 +12,9 @@
 }
 
 .my-pc__card {
+  /* Shrinks and scrolls so the Snapshot button below always stays visible. */
+  flex: 0 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(180px, 240px) 1fr;
   grid-template-areas:
@@ -118,6 +121,21 @@
   height: 28px;
   border-radius: var(--radius-sm);
   box-shadow: var(--clay-shadow);
+}
+
+.my-pc__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2) var(--space-4);
+  flex-shrink: 0;
+  padding-bottom: var(--space-2);
+}
+
+.my-pc__hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 
 @media (max-width: 820px) {

@@ -1,4 +1,15 @@
 {
   "name": "Crop PDF",
-  "description": "Trim margins or extract pages from a PDF."
+  "description": "Keep only the pages you need from a PDF.",
+  "choose": "Choose a PDF",
+  "pages": "Pages to keep",
+  "placeholder": "e.g. 1-5, 8, 11-13",
+  "hintEmpty": "Ranges and single pages, separated by commas.",
+  "hintPages_one": "The document has {{count}} page.",
+  "hintPages_other": "The document has {{count}} pages.",
+  "selected_one": "{{count}} page will be kept.",
+  "selected_other": "{{count}} pages will be kept.",
+  "crop": "Crop PDF",
+  "invalid": "Use page numbers and ranges like 1-5, 8, 11-13.",
+  "outOfRange": "Page {{page}} doesn’t exist (the document has {{total}})."
 }

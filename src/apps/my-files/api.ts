@@ -41,7 +41,17 @@ export const files = {
   rename: (home: string, path: string, newName: string) =>
     invoke<string>("files_rename", { home, path, newName }),
   remove: (home: string, path: string) => invoke<void>("files_delete", { home, path }),
+  permissions: (home: string, path: string) => invoke<FilePermissions>("files_permissions", { home, path }),
+  setPermissions: (home: string, path: string, next: FilePermissions) =>
+    invoke<FilePermissions>("files_set_permissions", { home, path, ...next }),
 };
+
+/** Effective access for the current user. `execute` is null on Windows. */
+export interface FilePermissions {
+  read: boolean;
+  write: boolean;
+  execute: boolean | null;
+}
 
 export function errorCode(error: unknown): FsErrorCode {
   const code = (error as Partial<FsError> | null)?.code;

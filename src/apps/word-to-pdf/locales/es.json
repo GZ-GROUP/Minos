@@ -1,4 +1,6 @@
 {
   "name": "Word a PDF",
-  "description": "Exporta documentos de Word como PDF."
+  "description": "Exporta documentos de Word como PDF.",
+  "choose": "Elige un documento de Word",
+  "convert": "Convertir a PDF"
 }

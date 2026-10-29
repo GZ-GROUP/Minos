@@ -1,0 +1,199 @@
+.file-selector {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-width: 0;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow-sm);
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+}
+
+/* ── Sizes ───────────────────────────────────────────────── */
+
+/* Large: icon on top, name and size stacked below, actions underneath. */
+.file-selector--lg {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 230px;
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+}
+
+.file-selector--lg .file-selector__icon {
+  width: 84px;
+  height: 84px;
+  border-radius: 30%;
+}
+
+.file-selector--lg .file-selector__icon svg {
+  width: 46px;
+  height: 46px;
+}
+
+.file-selector--lg .file-selector__text {
+  align-items: center;
+  width: 100%;
+}
+
+.file-selector--lg .file-selector__name {
+  font-size: var(--text-md);
+}
+
+/* Medium: icon left, name + size beside it, actions right. */
+.file-selector--md {
+  min-height: 64px;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.file-selector--md .file-selector__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-sm);
+}
+
+.file-selector--md .file-selector__icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.file-selector--md .file-selector__text,
+.file-selector--sm .file-selector__text {
+  flex: 1;
+}
+
+/* Small: a single line with name · size. */
+.file-selector--sm {
+  min-height: 40px;
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+}
+
+.file-selector--sm .file-selector__text {
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.file-selector--sm .file-selector__icon {
+  display: none;
+}
+
+/* ── Parts ───────────────────────────────────────────────── */
+
+.file-selector__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--color-bg);
+  box-shadow: var(--clay-shadow-inset);
+  color: var(--color-icon);
+}
+
+.file-selector__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.file-selector__name-tip {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.file-selector__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.file-selector__meta {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.file-selector__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+/* ── States ──────────────────────────────────────────────── */
+
+/* Empty pick slot: a sunken, dashed drop area. */
+.file-selector--empty,
+.file-selector--pending {
+  background: var(--color-bg);
+  box-shadow: var(--clay-shadow-inset);
+  outline: 2px dashed color-mix(in srgb, var(--color-text-muted) 35%, transparent);
+  outline-offset: -8px;
+}
+
+.file-selector--empty {
+  cursor: pointer;
+  transition:
+    outline-color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
+}
+
+.file-selector--empty:hover:not(:disabled) {
+  outline-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-bg));
+}
+
+.file-selector--empty:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.file-selector--empty:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.file-selector--empty .file-selector__icon,
+.file-selector--pending .file-selector__icon {
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+.file-selector--empty .file-selector__name,
+.file-selector--pending .file-selector__name {
+  color: var(--color-text-muted);
+}
+
+.file-selector--pending .file-selector__icon {
+  color: var(--color-text-muted);
+}
+
+.file-selector--filled[data-mode="download"] {
+  box-shadow:
+    var(--clay-shadow-sm),
+    inset 0 0 0 2px color-mix(in srgb, var(--color-success) 45%, transparent);
+}
+
+.file-selector__spinner {
+  animation: file-selector-spin 0.9s linear infinite;
+}
+
+@keyframes file-selector-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

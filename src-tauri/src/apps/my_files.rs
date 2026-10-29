@@ -2,55 +2,15 @@
 //! to touch anything outside it, so the UI restriction is also enforced here.
 
 use std::fs;
-use std::io;
 use std::path::{Component, Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
 use serde::Serialize;
 use tauri::Manager;
 
-#[derive(Debug, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum FsErrorCode {
-    NotFound,
-    Exists,
-    PermissionDenied,
-    InvalidName,
-    OutsideHome,
-    NotEmpty,
-    Io,
-}
+use super::error::{AppError as FsError, AppResult, ErrorCode as FsErrorCode};
 
-/// Serialized as `{ code, message }`; the frontend translates `code`.
-#[derive(Debug, Serialize)]
-pub struct FsError {
-    code: FsErrorCode,
-    message: String,
-}
-
-impl FsError {
-    fn new(code: FsErrorCode, message: impl Into<String>) -> Self {
-        Self {
-            code,
-            message: message.into(),
-        }
-    }
-}
-
-impl From<io::Error> for FsError {
-    fn from(error: io::Error) -> Self {
-        let code = match error.kind() {
-            io::ErrorKind::NotFound => FsErrorCode::NotFound,
-            io::ErrorKind::AlreadyExists => FsErrorCode::Exists,
-            io::ErrorKind::PermissionDenied => FsErrorCode::PermissionDenied,
-            io::ErrorKind::DirectoryNotEmpty => FsErrorCode::NotEmpty,
-            _ => FsErrorCode::Io,
-        };
-        Self::new(code, error.to_string())
-    }
-}
-
-type FsResult<T> = Result<T, FsError>;
+type FsResult<T> = AppResult<T>;
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -317,6 +277,150 @@ pub async fn files_delete(home: String, path: String) -> FsResult<()> {
     Ok(())
 }
 
+// ── Permissions (files only) ──────────────────────────────────
+
+/// Effective access for the current user, measured by actually opening the file.
+#[derive(Debug, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct FilePermissions {
+    read: bool,
+    write: bool,
+    /// Owner execute bit on Unix; None on Windows, where it doesn't apply.
+    execute: Option<bool>,
+}
+
+fn regular_file(home: &Path, path: &str) -> FsResult<PathBuf> {
+    let target = resolve_within(home, path)?;
+    if !fs::metadata(&target)?.is_file() {
+        return Err(FsError::new(
+            FsErrorCode::InvalidInput,
+            "permissions can only be edited on files",
+        ));
+    }
+    Ok(target)
+}
+
+/// Opening for read / for write (without truncating) is the real test: it reflects
+/// mode bits, ACLs and the read-only attribute alike, and leaves the content untouched.
+fn effective_permissions(path: &Path) -> FilePermissions {
+    FilePermissions {
+        read: fs::File::open(path).is_ok(),
+        write: fs::OpenOptions::new().write(true).open(path).is_ok(),
+        execute: owner_execute(path),
+    }
+}
+
+#[cfg(unix)]
+fn owner_execute(path: &Path) -> Option<bool> {
+    use std::os::unix::fs::PermissionsExt;
+    fs::metadata(path)
+        .ok()
+        .map(|metadata| metadata.permissions().mode() & 0o100 != 0)
+}
+
+#[cfg(not(unix))]
+fn owner_execute(_path: &Path) -> Option<bool> {
+    None
+}
+
+/// Unix: owner rwx bits; group and other bits are kept as they are.
+#[cfg(unix)]
+fn apply_permissions(path: &Path, read: bool, write: bool, execute: Option<bool>) -> FsResult<()> {
+    use std::os::unix::fs::PermissionsExt;
+    let set = |mode: u32, bit: u32, on: bool| if on { mode | bit } else { mode & !bit };
+    let mut mode = fs::metadata(path)?.permissions().mode();
+    mode = set(mode, 0o400, read);
+    mode = set(mode, 0o200, write);
+    if let Some(execute) = execute {
+        mode = set(mode, 0o100, execute);
+    }
+    fs::set_permissions(path, fs::Permissions::from_mode(mode))?;
+    Ok(())
+}
+
+/// Windows: deny entries for the current user, managed with the built-in `icacls`.
+/// Only data access is denied — (RD) read data, (WD,AD) write/append data — so the
+/// file still lists normally and its attributes stay editable. Owners can always
+/// change the ACL of their own files, so no administrator rights are needed.
+#[cfg(windows)]
+fn apply_permissions(path: &Path, read: bool, write: bool, _execute: Option<bool>) -> FsResult<()> {
+    let user = std::env::var("USERNAME")
+        .map_err(|_| FsError::new(FsErrorCode::Io, "the current user is unknown"))?;
+    let principal = match std::env::var("USERDOMAIN") {
+        Ok(domain) if !domain.is_empty() => format!("{domain}\\{user}"),
+        _ => user,
+    };
+    icacls(path, &["/remove:d", &principal])?;
+    if !read {
+        icacls(path, &["/deny", &format!("{principal}:(RD)")])?;
+    }
+    if write {
+        let mut permissions = fs::metadata(path)?.permissions();
+        if permissions.readonly() {
+            // On Windows this only clears the read-only attribute.
+            #[allow(clippy::permissions_set_readonly_false)]
+            permissions.set_readonly(false);
+            fs::set_permissions(path, permissions)?;
+        }
+    } else {
+        icacls(path, &["/deny", &format!("{principal}:(WD,AD)")])?;
+    }
+    Ok(())
+}
+
+#[cfg(windows)]
+fn icacls(path: &Path, args: &[&str]) -> FsResult<()> {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+    // No shell: the path and each option are separate arguments.
+    let output = std::process::Command::new("icacls")
+        .arg(display_path(path))
+        .args(args)
+        .creation_flags(CREATE_NO_WINDOW)
+        .output()?;
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(FsError::new(
+            FsErrorCode::PermissionDenied,
+            String::from_utf8_lossy(&output.stdout).trim().to_string(),
+        ))
+    }
+}
+
+#[cfg(not(any(unix, windows)))]
+fn apply_permissions(
+    _path: &Path,
+    _read: bool,
+    _write: bool,
+    _execute: Option<bool>,
+) -> FsResult<()> {
+    Err(FsError::new(
+        FsErrorCode::Io,
+        "editing permissions isn't supported on this system",
+    ))
+}
+
+#[tauri::command]
+pub async fn files_permissions(home: String, path: String) -> FsResult<FilePermissions> {
+    let home = canonical_home(&home)?;
+    Ok(effective_permissions(&regular_file(&home, &path)?))
+}
+
+#[tauri::command]
+pub async fn files_set_permissions(
+    home: String,
+    path: String,
+    read: bool,
+    write: bool,
+    execute: Option<bool>,
+) -> FsResult<FilePermissions> {
+    let home = canonical_home(&home)?;
+    let target = regular_file(&home, &path)?;
+    apply_permissions(&target, read, write, execute)?;
+    Ok(effective_permissions(&target))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -430,5 +534,59 @@ mod tests {
                 .len(),
             2
         );
+    }
+
+    /// Applies real permissions (mode bits on Unix, icacls deny entries on Windows) and
+    /// checks that reading and writing actually fail and recover.
+    #[test]
+    fn read_and_write_permissions_take_effect() {
+        let (_dir, home) = setup();
+        let file = block_on(files_create_file(
+            home.clone(),
+            home.clone(),
+            "test.txt".into(),
+        ))
+        .unwrap();
+        fs::write(&file, "original").unwrap();
+        let set = |read, write| {
+            block_on(files_set_permissions(
+                home.clone(),
+                file.clone(),
+                read,
+                write,
+                None,
+            ))
+            .unwrap()
+        };
+
+        let state = set(false, true);
+        assert!(!state.read && state.write);
+        assert!(fs::read_to_string(&file).is_err(), "reading must be denied");
+
+        let state = set(true, false);
+        assert!(state.read && !state.write);
+        assert_eq!(fs::read_to_string(&file).unwrap(), "original");
+        assert!(
+            fs::write(&file, "changed").is_err(),
+            "writing must be denied"
+        );
+
+        let state = set(true, true);
+        assert!(state.read && state.write);
+        fs::write(&file, "changed").unwrap();
+        assert_eq!(fs::read_to_string(&file).unwrap(), "changed");
+    }
+
+    #[test]
+    fn permissions_are_for_files_only() {
+        let (_dir, home) = setup();
+        let folder = block_on(files_create_dir(
+            home.clone(),
+            home.clone(),
+            "folder".into(),
+        ))
+        .unwrap();
+        let error = block_on(files_permissions(home, folder)).unwrap_err();
+        assert_eq!(error.code, FsErrorCode::InvalidInput);
     }
 }

@@ -5,8 +5,32 @@
   box-shadow: var(--clay-shadow);
 }
 
-.about-modal__version {
-  font-size: var(--text-sm);
-  font-weight: 500;
+.about-modal__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
   color: var(--color-accent-text);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-squish);
+}
+
+.about-modal__link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.about-modal__link:hover {
+  background: var(--color-surface-raised);
+  box-shadow: var(--clay-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.about-modal__version {
+  font-variant-numeric: tabular-nums;
 }

@@ -1,4 +1,12 @@
 {
   "name": "Merge PDF",
-  "description": "Combine several PDFs into a single file."
+  "description": "Combine several PDFs into a single file.",
+  "choose": "Choose the PDFs to merge",
+  "order": "Merge order",
+  "add": "Add PDFs",
+  "moveUp": "Move {{name}} up",
+  "moveDown": "Move {{name}} down",
+  "needTwo": "Add at least two PDFs",
+  "merge_one": "Merge {{count}} PDF",
+  "merge_other": "Merge {{count}} PDFs"
 }

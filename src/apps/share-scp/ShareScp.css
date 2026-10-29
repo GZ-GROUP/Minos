@@ -1,0 +1,117 @@
+.share-scp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Connection form ─────────────────────────────────────── */
+
+.share-scp--form {
+  overflow: auto;
+  padding: var(--space-1) var(--space-2) var(--space-4);
+}
+
+.share-scp__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(460px, 100%);
+  margin: auto;
+  padding: var(--space-6);
+}
+
+.share-scp__form-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.share-scp__form-header h3 {
+  font-size: var(--text-lg);
+}
+
+.share-scp__form-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  box-shadow: var(--clay-shadow-inset);
+  color: var(--color-icon);
+}
+
+.share-scp__form-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.share-scp__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: var(--space-3);
+}
+
+.share-scp__security {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.share-scp__security svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--color-success-text);
+}
+
+/* ── Connected ───────────────────────────────────────────── */
+
+.share-scp__bar,
+.share-scp__transfer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.share-scp__bar > .button {
+  margin-left: auto;
+}
+
+.share-scp__identity {
+  display: inline-flex;
+  border-radius: var(--radius-pill);
+}
+
+.share-scp__new-host {
+  flex: 1 1 240px;
+  min-width: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+
+.share-scp__local {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.share-scp__local .file-selector {
+  flex: 1;
+}
+
+.share-scp__switch-label {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}

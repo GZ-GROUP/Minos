@@ -6,7 +6,8 @@
     "newFolder": "Nueva carpeta",
     "rename": "Renombrar",
     "delete": "Eliminar",
-    "create": "Crear"
+    "create": "Crear",
+    "permissions": "Permisos"
   },
   "showHidden": "Mostrar ocultos",
   "fields": {
@@ -44,5 +45,25 @@
     "outside_home": "Esa ubicación está fuera de tu carpeta personal.",
     "not_empty": "La carpeta no está vacía.",
     "io": "No se pudo completar la operación."
+  },
+  "permissions": {
+    "title": "Permisos",
+    "message": "Elige qué puedes hacer con «{{name}}».",
+    "current": "Acceso actual:",
+    "readable": "Se puede leer",
+    "notReadable": "No se puede leer",
+    "writable": "Se puede escribir",
+    "readOnly": "Solo lectura",
+    "executable": "Ejecutable",
+    "notExecutable": "No ejecutable",
+    "read": "Lectura",
+    "readHint": "Sin este permiso, el contenido del archivo no se puede abrir ni ver.",
+    "write": "Escritura",
+    "writeHint": "Sin este permiso, el archivo no se puede modificar ni guardar.",
+    "execute": "Ejecución",
+    "executeHint": "Permite ejecutar el archivo como programa o script.",
+    "apply": "Aplicar",
+    "applied": "Permisos actualizados. El acceso actual se volvió a comprobar.",
+    "filesOnly": "Los permisos solo se pueden editar en archivos."
   }
 }

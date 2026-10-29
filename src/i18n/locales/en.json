@@ -9,8 +9,10 @@
   "about": {
     "title": "About Minos",
     "version": "Version {{version}}",
-    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Cras mattis consectetur purus sit amet fermentum.",
-    "close": "Close"
+    "close": "Close",
+    "description": "Minos is a modular desktop toolbox that brings system diagnostics, file management and everyday utilities together in one place.",
+    "developer": "Created by Ian Lee (@iangl2), a software development student based in Panama.",
+    "github": "View on GitHub"
   },
   "drawer": {
     "label": "Apps",
@@ -61,5 +63,53 @@
     "items_one": "{{count}} item",
     "items_other": "{{count}} items",
     "folder": "Folder"
+  },
+  "fileSelector": {
+    "choose": "Choose a file",
+    "browse": "Click to browse",
+    "change": "Change file",
+    "remove": "Remove file",
+    "download": "Download",
+    "saved": "Saved",
+    "result": "The result will appear here",
+    "working": "Working…"
+  },
+  "convert": {
+    "libreoffice": "LibreOffice",
+    "libreofficeHint": "Full-fidelity conversion with LibreOffice.",
+    "basic": "Basic mode · text only",
+    "basicHint": "LibreOffice isn’t installed, so only the text is converted. Install LibreOffice to keep formatting, images and tables.",
+    "usedBasic": "Converted in basic mode: only the text was kept."
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "not_found": "The file no longer exists.",
+    "exists": "An item with that name already exists.",
+    "permission_denied": "You don’t have permission to do that.",
+    "invalid_name": "That name isn’t valid.",
+    "invalid_input": "Check the values you entered.",
+    "outside_home": "That location isn’t allowed.",
+    "not_empty": "The folder isn’t empty.",
+    "invalid_pdf": "The file isn’t a valid PDF, or it’s password-protected.",
+    "conversion_failed": "The file couldn’t be converted.",
+    "unsupported_format": "That file type can’t be converted without LibreOffice.",
+    "unreachable": "The server can’t be reached.",
+    "auth_failed": "Wrong user or password.",
+    "host_key_changed": "The server’s identity changed. This can mean someone is intercepting the connection.",
+    "not_connected": "You’re not connected.",
+    "timeout": "The operation took too long.",
+    "io": "The operation couldn’t be completed."
+  },
+  "numeric": {
+    "increase": "Increase",
+    "decrease": "Decrease",
+    "required": "Enter a number.",
+    "min": "Must be at least {{min}}.",
+    "max": "Must be at most {{max}}."
+  },
+  "console": {
+    "copy": "Copy output",
+    "clear": "Clear console",
+    "input": "Command"
   }
 }

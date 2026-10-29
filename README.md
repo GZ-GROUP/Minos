@@ -20,6 +20,11 @@ Minos is a desktop app that bundles small everyday tools (PDF conversion, file s
 | Merge PDF | Planned |
 | Share over Network | Planned |
 | Share over SCP | Planned |
+| Processes | Available |
+| My PC | Available |
+| My Network | Available |
+| My Disks | Available |
+| My Files | Available |
 
 ## Adding a tool
 

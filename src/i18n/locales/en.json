@@ -33,5 +33,33 @@
     "maximize": "Maximize",
     "restore": "Restore",
     "close": "Close"
+  },
+  "list": {
+    "search": "Search…",
+    "searchLabel": "Search in {{label}}",
+    "count_one": "{{count}} item",
+    "count_other": "{{count}} items",
+    "loading": "Loading…",
+    "empty": "Nothing to show.",
+    "noResults": "No results for “{{query}}”.",
+    "error": "Couldn’t load the data.",
+    "notAvailable": "System data is only available in the Minos desktop app.",
+    "refresh": "Refresh",
+    "live": "Live",
+    "clearSearch": "Clear search"
+  },
+  "dialog": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "tree": {
+    "breadcrumb": "Location",
+    "up": "Up one level",
+    "home": "Home",
+    "empty": "This folder is empty.",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "folder": "Folder"
   }
 }

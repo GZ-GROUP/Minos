@@ -1,0 +1,35 @@
+.my-network__adapter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Connection status: green = connected, muted = disconnected. */
+.my-network__dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  box-shadow: var(--clay-shadow-inset);
+  opacity: 0.5;
+}
+
+.my-network__dot[data-up="true"] {
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 22%, transparent);
+  opacity: 1;
+}
+
+.my-network__badge {
+  margin-left: var(--space-2);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  color: var(--color-accent-text);
+  font-family: var(--font-heading);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  vertical-align: 1px;
+}

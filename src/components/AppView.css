@@ -35,9 +35,8 @@
 .app-view__body {
   flex: 1;
   min-height: 0;
-  overflow: auto;
-  display: grid;
-  align-content: center;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes app-view-in {

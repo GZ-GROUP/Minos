@@ -1,0 +1,10 @@
+{
+  "name": "Processes",
+  "description": "See running processes and their CPU and memory usage.",
+  "columns": {
+    "name": "Name",
+    "pid": "PID",
+    "cpu": "CPU",
+    "memory": "Memory"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "Mis Archivos",
+  "description": "Explora tus carpetas y crea, renombra o elimina archivos.",
+  "actions": {
+    "newFile": "Nuevo archivo",
+    "newFolder": "Nueva carpeta",
+    "rename": "Renombrar",
+    "delete": "Eliminar",
+    "create": "Crear"
+  },
+  "showHidden": "Mostrar ocultos",
+  "fields": {
+    "name": "Nombre"
+  },
+  "newFile": {
+    "title": "Nuevo archivo",
+    "default": "Nuevo archivo.txt"
+  },
+  "newFolder": {
+    "title": "Nueva carpeta",
+    "default": "Nueva carpeta"
+  },
+  "rename": {
+    "title": "Renombrar",
+    "message": "Elige un nombre nuevo para «{{name}}»."
+  },
+  "delete": {
+    "title": "¿Eliminar «{{name}}»?",
+    "fileMessage": "El archivo se eliminará de forma permanente. No se puede deshacer.",
+    "folderMessage": "La carpeta y todo su contenido se eliminarán de forma permanente. No se puede deshacer."
+  },
+  "validation": {
+    "empty": "Escribe un nombre.",
+    "chars": "Los nombres no pueden contener \\ / : * ? \" < > |",
+    "edges": "Los nombres no pueden empezar con espacio ni terminar en punto o espacio.",
+    "reserved": "Ese nombre está reservado por el sistema."
+  },
+  "errors": {
+    "title": "Algo salió mal",
+    "not_found": "El elemento ya no existe.",
+    "exists": "Ya existe un elemento con ese nombre.",
+    "permission_denied": "No tienes permiso para hacer eso aquí.",
+    "invalid_name": "Ese nombre no es válido.",
+    "outside_home": "Esa ubicación está fuera de tu carpeta personal.",
+    "not_empty": "La carpeta no está vacía.",
+    "io": "No se pudo completar la operación."
+  }
+}

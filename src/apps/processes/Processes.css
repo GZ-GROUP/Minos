@@ -1,0 +1,6 @@
+.processes__cpu {
+  display: grid;
+  grid-template-columns: 1fr 56px;
+  align-items: center;
+  gap: var(--space-3);
+}

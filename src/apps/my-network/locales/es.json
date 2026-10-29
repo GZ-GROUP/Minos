@@ -1,0 +1,20 @@
+{
+  "name": "Mi Red",
+  "description": "Adaptadores de red con sus direcciones, máscaras y puertas de enlace.",
+  "columns": {
+    "adapter": "Adaptador",
+    "status": "Estado",
+    "ipv4": "Dirección IP",
+    "mask": "Máscara de subred",
+    "mac": "Dirección MAC",
+    "gateway": "Puerta de enlace"
+  },
+  "status": {
+    "up": "Conectado",
+    "down": "Desconectado"
+  },
+  "default": "Predeterminado",
+  "dhcp": "DHCP",
+  "static": "Estática",
+  "none": "—"
+}

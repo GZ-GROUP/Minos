@@ -1,0 +1,32 @@
+.my-files {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+  min-height: 0;
+}
+
+.my-files__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+}
+
+.my-files__group {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.my-files__switch-label {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Destructive action stays a calm secondary button; only the icon warns. */
+.my-files__delete svg {
+  color: var(--color-danger-text);
+}

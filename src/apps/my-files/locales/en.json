@@ -1,0 +1,48 @@
+{
+  "name": "My Files",
+  "description": "Browse your folders and create, rename or delete files.",
+  "actions": {
+    "newFile": "New file",
+    "newFolder": "New folder",
+    "rename": "Rename",
+    "delete": "Delete",
+    "create": "Create"
+  },
+  "showHidden": "Show hidden",
+  "fields": {
+    "name": "Name"
+  },
+  "newFile": {
+    "title": "New file",
+    "default": "New file.txt"
+  },
+  "newFolder": {
+    "title": "New folder",
+    "default": "New folder"
+  },
+  "rename": {
+    "title": "Rename",
+    "message": "Choose a new name for “{{name}}”."
+  },
+  "delete": {
+    "title": "Delete “{{name}}”?",
+    "fileMessage": "The file will be permanently deleted. This can’t be undone.",
+    "folderMessage": "The folder and everything inside it will be permanently deleted. This can’t be undone."
+  },
+  "validation": {
+    "empty": "Enter a name.",
+    "chars": "Names can’t contain \\ / : * ? \" < > |",
+    "edges": "Names can’t start with a space or end with a dot or space.",
+    "reserved": "That name is reserved by the system."
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "not_found": "The item no longer exists.",
+    "exists": "An item with that name already exists.",
+    "permission_denied": "You don’t have permission to do that here.",
+    "invalid_name": "That name isn’t valid.",
+    "outside_home": "That location is outside your home folder.",
+    "not_empty": "The folder isn’t empty.",
+    "io": "The operation couldn’t be completed."
+  }
+}

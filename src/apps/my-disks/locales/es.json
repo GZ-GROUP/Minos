@@ -1,0 +1,18 @@
+{
+  "name": "Mis Discos",
+  "description": "Unidades de almacenamiento con su espacio total y disponible.",
+  "columns": {
+    "disk": "Disco",
+    "fileSystem": "Sistema de archivos",
+    "kind": "Tipo",
+    "total": "Tamaño total",
+    "available": "Disponible",
+    "used": "En uso"
+  },
+  "kind": {
+    "ssd": "SSD",
+    "hdd": "HDD",
+    "unknown": "Desconocido",
+    "removable": "Extraíble"
+  }
+}

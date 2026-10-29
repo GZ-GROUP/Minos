@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import logo from "../assets/logo.png";
 import { version } from "../../package.json";
+import { Button } from "./Button";
+import { Dialog } from "./dialogs/Dialog";
 import "./AboutModal.css";
 
 interface AboutModalProps {
@@ -9,38 +10,24 @@ interface AboutModalProps {
   onClose: () => void;
 }
 
-/** Uses the native <dialog> for focus trapping, Esc handling and top-layer rendering. */
 export function AboutModal({ open, onClose }: AboutModalProps) {
   const { t } = useTranslation();
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="about-modal clay"
-      aria-labelledby="about-title"
+    <Dialog
+      open={open}
       onClose={onClose}
-      onClick={(event) => {
-        // Clicking the backdrop targets the dialog element itself.
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <div className="about-modal__content">
-        <img className="about-modal__logo" src={logo} alt="" />
-        <h2 id="about-title">{t("about.title")}</h2>
-        <p className="about-modal__version">{t("about.version", { version })}</p>
-        <p className="about-modal__body">{t("about.body")}</p>
-        <button type="button" className="clay-button clay-button--primary" onClick={onClose} autoFocus>
+      title={t("about.title")}
+      align="center"
+      media={<img className="about-modal__logo" src={logo} alt="" />}
+      actions={
+        <Button variant="primary" autoFocus onClick={onClose}>
           {t("about.close")}
-        </button>
-      </div>
-    </dialog>
+        </Button>
+      }
+    >
+      <p className="about-modal__version">{t("about.version", { version })}</p>
+      <p>{t("about.body")}</p>
+    </Dialog>
   );
 }

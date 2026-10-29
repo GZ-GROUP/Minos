@@ -1,0 +1,6 @@
+.my-disks__used {
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  align-items: center;
+  gap: var(--space-3);
+}

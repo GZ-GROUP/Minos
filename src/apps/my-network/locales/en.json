@@ -1,0 +1,20 @@
+{
+  "name": "My Network",
+  "description": "Network adapters with their addresses, masks and gateways.",
+  "columns": {
+    "adapter": "Adapter",
+    "status": "Status",
+    "ipv4": "IP address",
+    "mask": "Subnet mask",
+    "mac": "MAC address",
+    "gateway": "Gateway"
+  },
+  "status": {
+    "up": "Connected",
+    "down": "Disconnected"
+  },
+  "default": "Default",
+  "dhcp": "DHCP",
+  "static": "Static",
+  "none": "—"
+}

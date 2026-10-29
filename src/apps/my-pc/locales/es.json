@@ -1,0 +1,20 @@
+{
+  "name": "Mi PC",
+  "description": "El hardware y el sistema operativo de un vistazo.",
+  "specs": {
+    "os": "SO",
+    "kernel": "Kernel",
+    "host": "Equipo",
+    "uptime": "Encendido",
+    "cpu": "CPU",
+    "cores": "Núcleos",
+    "gpu": "GPU",
+    "memory": "Memoria",
+    "swap": "Swap",
+    "arch": "Arquitectura"
+  },
+  "coresValue": "{{physical}} núcleos · {{logical}} hilos",
+  "threadsValue": "{{logical}} hilos",
+  "usedOf": "{{used}} de {{total}}",
+  "unknown": "Desconocido"
+}

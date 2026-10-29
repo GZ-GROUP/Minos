@@ -1,0 +1,10 @@
+{
+  "name": "Procesos",
+  "description": "Consulta los procesos en ejecución y su uso de CPU y memoria.",
+  "columns": {
+    "name": "Nombre",
+    "pid": "PID",
+    "cpu": "CPU",
+    "memory": "Memoria"
+  }
+}

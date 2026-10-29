@@ -7,6 +7,7 @@ import "./styles/global.css";
 import "./i18n";
 import { IconContext } from "@phosphor-icons/react";
 import { ThemeProvider } from "./theme/ThemeProvider";
+import { DialogProvider } from "./components/dialogs/DialogProvider";
 import App from "./App";
 
 // Icons inherit `currentColor`, so each surface sets their color via the --color-icon token.
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <IconContext.Provider value={iconDefaults}>
       <ThemeProvider>
-        <App />
+        <DialogProvider>
+          <App />
+        </DialogProvider>
       </ThemeProvider>
     </IconContext.Provider>
   </React.StrictMode>,

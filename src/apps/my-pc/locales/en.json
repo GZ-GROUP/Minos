@@ -1,0 +1,20 @@
+{
+  "name": "My PC",
+  "description": "Hardware and operating system at a glance.",
+  "specs": {
+    "os": "OS",
+    "kernel": "Kernel",
+    "host": "Host",
+    "uptime": "Uptime",
+    "cpu": "CPU",
+    "cores": "Cores",
+    "gpu": "GPU",
+    "memory": "Memory",
+    "swap": "Swap",
+    "arch": "Architecture"
+  },
+  "coresValue": "{{physical}} cores · {{logical}} threads",
+  "threadsValue": "{{logical}} threads",
+  "usedOf": "{{used}} of {{total}}",
+  "unknown": "Unknown"
+}

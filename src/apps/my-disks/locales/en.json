@@ -1,0 +1,18 @@
+{
+  "name": "My Disks",
+  "description": "Storage drives with their total and free space.",
+  "columns": {
+    "disk": "Disk",
+    "fileSystem": "File system",
+    "kind": "Type",
+    "total": "Total size",
+    "available": "Available",
+    "used": "Used"
+  },
+  "kind": {
+    "ssd": "SSD",
+    "hdd": "HDD",
+    "unknown": "Unknown",
+    "removable": "Removable"
+  }
+}

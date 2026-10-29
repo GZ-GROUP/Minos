@@ -1,0 +1,170 @@
+.dialog {
+  width: min(440px, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100vh - 2 * var(--space-6));
+  padding: 0;
+  border: none;
+  color: var(--color-text);
+  overflow: auto;
+}
+
+.dialog[open] {
+  animation: dialog-pop var(--duration-base) var(--ease-squish);
+}
+
+.dialog::backdrop {
+  background: var(--color-backdrop);
+  backdrop-filter: blur(4px);
+}
+
+.dialog__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+/* Header: icon bubble + title */
+.dialog__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dialog__icon {
+  --dialog-accent: var(--color-icon);
+
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--dialog-accent) 14%, var(--color-bg));
+  box-shadow: var(--clay-shadow-inset);
+  color: var(--dialog-accent);
+}
+
+.dialog[data-tone="danger"] .dialog__icon {
+  --dialog-accent: var(--color-danger-text);
+}
+
+.dialog[data-tone="success"] .dialog__icon {
+  --dialog-accent: var(--color-success-text);
+}
+
+.dialog__icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.dialog__title {
+  font-size: var(--text-lg);
+  overflow-wrap: anywhere;
+}
+
+.dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  color: var(--color-text-muted);
+  user-select: text;
+}
+
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* Centered variant (About) */
+.dialog[data-align="center"] .dialog__header {
+  flex-direction: column;
+  text-align: center;
+}
+
+.dialog[data-align="center"] .dialog__title {
+  font-size: var(--text-xl);
+}
+
+.dialog[data-align="center"] .dialog__body {
+  align-items: center;
+  text-align: center;
+}
+
+.dialog[data-align="center"] .dialog__actions {
+  justify-content: center;
+}
+
+/* ── Form fields (InputBox) ─────────────────────────────── */
+
+.dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dialog-field__label {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.dialog-field__input {
+  height: 44px;
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  box-shadow: var(--clay-shadow-inset);
+  color: var(--color-text);
+  font: inherit;
+  outline: none;
+  transition: box-shadow var(--duration-fast) ease;
+}
+
+.dialog-field__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.8;
+}
+
+.dialog-field__input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.dialog-field__input[aria-invalid="true"] {
+  box-shadow:
+    var(--clay-shadow-inset),
+    0 0 0 2px var(--color-danger);
+}
+
+.dialog-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-danger-text);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.dialog-error svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+
+@keyframes dialog-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

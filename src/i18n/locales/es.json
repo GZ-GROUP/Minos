@@ -33,5 +33,33 @@
     "maximize": "Maximizar",
     "restore": "Restaurar",
     "close": "Cerrar"
+  },
+  "list": {
+    "search": "Buscar…",
+    "searchLabel": "Buscar en {{label}}",
+    "count_one": "{{count}} elemento",
+    "count_other": "{{count}} elementos",
+    "loading": "Cargando…",
+    "empty": "No hay nada que mostrar.",
+    "noResults": "Sin resultados para «{{query}}».",
+    "error": "No se pudieron cargar los datos.",
+    "notAvailable": "Los datos del sistema solo están disponibles en la app de escritorio de Minos.",
+    "refresh": "Actualizar",
+    "live": "En vivo",
+    "clearSearch": "Borrar búsqueda"
+  },
+  "dialog": {
+    "ok": "Aceptar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "tree": {
+    "breadcrumb": "Ubicación",
+    "up": "Subir un nivel",
+    "home": "Inicio",
+    "empty": "Esta carpeta está vacía.",
+    "items_one": "{{count}} elemento",
+    "items_other": "{{count}} elementos",
+    "folder": "Carpeta"
   }
 }

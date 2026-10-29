@@ -2,6 +2,7 @@ import { Suspense, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "@phosphor-icons/react";
 import type { AppDefinition } from "../apps/types";
+import { Button } from "./Button";
 import "./AppView.css";
 
 interface AppViewProps {
@@ -28,9 +29,9 @@ export function AppView({ app, onBack }: AppViewProps) {
   return (
     <section className="app-view" aria-labelledby="app-view-title">
       <header className="app-view__header">
-        <button ref={backRef} type="button" className="clay-button" onClick={onBack}>
-          <ArrowLeft size={18} weight="bold" aria-hidden="true" /> {t("appView.back")}
-        </button>
+        <Button ref={backRef} icon={ArrowLeft} onClick={onBack}>
+          {t("appView.back")}
+        </Button>
         <span className="app-view__icon" aria-hidden="true">
           <Icon size={34} />
         </span>

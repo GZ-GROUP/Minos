@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "my-files",
   icon: FolderOpen,
-  order: 11,
+  category: "files",
 } satisfies AppManifest;

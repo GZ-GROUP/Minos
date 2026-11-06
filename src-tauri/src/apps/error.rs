@@ -23,6 +23,10 @@ pub enum ErrorCode {
     HostKeyChanged,
     NotConnected,
     Timeout,
+    InvalidRepositoryUrl,
+    InvalidModule,
+    UnsupportedPlatform,
+    RateLimited,
     Io,
 }
 

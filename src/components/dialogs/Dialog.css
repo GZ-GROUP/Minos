@@ -109,6 +109,32 @@
   justify-content: center;
 }
 
+/* Wide variant (Marketplace) */
+.dialog[data-size="wide"] {
+  width: min(920px, calc(100vw - 2 * var(--space-4)));
+  height: min(640px, calc(100vh - 2 * var(--space-6)));
+  overflow: hidden;
+}
+
+.dialog[data-size="wide"] .dialog__content {
+  height: 100%;
+  padding: var(--space-5);
+}
+
+.dialog[data-size="wide"] .dialog__body {
+  flex: 1;
+  min-height: 0;
+}
+
+.dialog__header-end {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+  margin-left: var(--space-2);
+}
+
 /* Form-level error (multi-field InputBox) */
 .dialog-error {
   display: flex;

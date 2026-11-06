@@ -14,6 +14,10 @@ interface DialogProps {
   /** Replaces the icon bubble, e.g. a logo. */
   media?: ReactNode;
   align?: "start" | "center";
+  /** "wide" fills most of the window, for dialogs that hold a whole view. */
+  size?: "default" | "wide";
+  /** Controls next to the title. */
+  headerEnd?: ReactNode;
   children?: ReactNode;
   actions?: ReactNode;
   /** Small print under the actions, separated by a divider (links, version…). */
@@ -34,6 +38,8 @@ export function Dialog({
   tone = "default",
   media,
   align = "start",
+  size = "default",
+  headerEnd,
   children,
   actions,
   footer,
@@ -61,6 +67,7 @@ export function Dialog({
         <h2 id={titleId} className="dialog__title">
           {title}
         </h2>
+        {headerEnd && <div className="dialog__header-end">{headerEnd}</div>}
       </header>
       {children && <div className="dialog__body">{children}</div>}
       {actions && <footer className="dialog__actions">{actions}</footer>}
@@ -74,6 +81,7 @@ export function Dialog({
       className="dialog clay"
       data-tone={tone}
       data-align={align}
+      data-size={size}
       aria-labelledby={titleId}
       onCancel={(event) => {
         // Keep React in control of `open`; the parent decides how to close.

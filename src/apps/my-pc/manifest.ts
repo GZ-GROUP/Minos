@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "my-pc",
   icon: Desktop,
-  order: 8,
+  category: "system",
 } satisfies AppManifest;

@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "share-scp",
   icon: TerminalWindow,
-  order: 6,
+  category: "network",
 } satisfies AppManifest;

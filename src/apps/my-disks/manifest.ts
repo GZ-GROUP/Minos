@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "my-disks",
   icon: HardDrives,
-  order: 10,
+  category: "system",
 } satisfies AppManifest;

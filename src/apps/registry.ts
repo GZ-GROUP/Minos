@@ -44,9 +44,9 @@ export const apps: AppDefinition[] = Object.entries(manifests)
       {
         id: folder,
         icon: manifest.icon,
-        order: manifest.order ?? Number.MAX_SAFE_INTEGER,
+        category: manifest.category,
+        platforms: manifest.platforms,
         Component: lazy(loader),
       },
     ];
-  })
-  .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+  });

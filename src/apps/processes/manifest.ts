@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "processes",
   icon: Pulse,
-  order: 7,
+  category: "system",
 } satisfies AppManifest;

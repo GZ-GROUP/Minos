@@ -97,6 +97,12 @@ def main() -> None:
     # OpenCV's video codecs: about 30 MB that pdf2docx's image handling never loads.
     for codec in bundle.rglob("opencv_videoio_ffmpeg*"):
         codec.unlink()
+    # python-docx opens its templates through docx/parts/../templates. The code of that folder
+    # is in PyInstaller's archive, so it isn't on disk, and Linux and macOS won't resolve a path
+    # through a missing folder. The file keeps installers from dropping it for being empty.
+    parts = bundle / "_internal" / "docx" / "parts"
+    parts.mkdir(parents=True, exist_ok=True)
+    (parts / ".keep").touch()
     # PyInstaller replaces the folder, and this placeholder is tracked by git.
     (bundle / ".gitkeep").touch()
     smoke_test(bundle)

@@ -1,0 +1,48 @@
+name: Build the PDF engine
+description: >
+  Builds pdf-engine/ into src-tauri/pdf-engine-dist, which Tauri bundles as a resource.
+  The engine bundles Pango to render PDFs, so the build machine needs it. The build
+  fails if the result can't convert in both directions.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      id: python
+      with:
+        python-version: "3.12"
+
+    - uses: msys2/setup-msys2@v2
+      if: runner.os == 'Windows'
+      id: msys2
+      with:
+        msystem: UCRT64
+        update: false
+        install: mingw-w64-ucrt-x86_64-pango
+
+    - name: Install Pango (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+
+    - name: Install Pango (macOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: brew install pango
+
+    # Pango's folder is only on the path for this step: MSYS2 also brings its own Python
+    # and tools, which mustn't replace the runner's in the steps after this one.
+    - name: Build the engine
+      shell: bash
+      env:
+        PYTHON: ${{ steps.python.outputs.python-path }}
+        MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+      run: |
+        "$PYTHON" -m pip install -r pdf-engine/requirements.in -r pdf-engine/requirements-dev.txt
+        case "$RUNNER_OS" in
+          Windows) export PATH="$(cygpath -u "$MSYS2_LOCATION")/ucrt64/bin:$PATH" ;;
+          macOS) export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib" ;;
+        esac
+        "$PYTHON" pdf-engine/build.py

@@ -19,7 +19,7 @@ jobs:
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev libssl-dev patchelf
 
       - uses: actions/setup-node@v5
         with:
@@ -51,3 +51,24 @@ jobs:
       - name: Rust tests
         working-directory: src-tauri
         run: cargo test
+
+  pdf-engine:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      # The tests also cover DOCX -> PDF, which renders with Pango.
+      - name: Install Pango
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install -r requirements.in -r requirements-dev.txt
+        working-directory: pdf-engine
+
+      - run: python -m pytest tests
+        working-directory: pdf-engine

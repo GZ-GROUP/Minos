@@ -20,7 +20,8 @@ jobs:
             args: ""
           - platform: macos-latest
             args: "--target aarch64-apple-darwin"
-          - platform: macos-latest
+          # A real Intel machine: the PDF engine can't be cross-compiled.
+          - platform: macos-15-intel
             args: "--target x86_64-apple-darwin"
     runs-on: ${{ matrix.platform }}
     steps:
@@ -30,7 +31,7 @@ jobs:
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev libssl-dev patchelf
 
       - uses: actions/setup-node@v5
         with:
@@ -38,15 +39,14 @@ jobs:
           cache: npm
 
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          # Both macOS targets so Apple Silicon and Intel builds can run on the same runner image.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri -> target
 
       - run: npm ci
+
+      - uses: ./.github/actions/pdf-engine
 
       - uses: tauri-apps/tauri-action@v0
         env:

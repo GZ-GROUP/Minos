@@ -19,11 +19,9 @@ use super::error::{AppError, AppResult, ErrorCode};
 use super::file_io::{FileInfo, file_stem, new_output_dir};
 
 const PDF_ENGINE_TIMEOUT: Duration = Duration::from_secs(300);
-const PDF_ENGINE_EXE: &str = if cfg!(windows) {
-    "minos-pdf.exe"
-} else {
-    "minos-pdf"
-};
+// One bundle per direction, since their libraries conflict; see `pdf-engine/build.py`.
+const TO_DOCX: &str = "minos-to-docx";
+const TO_PDF: &str = "minos-to-pdf";
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -72,10 +70,16 @@ fn hide_console(command: &mut Command) {
 
 /// Where the engine may be: packaged with the app, or built for development by
 /// `pdf-engine/build.py`.
-fn pdf_engine_candidates(resource_dir: Option<PathBuf>) -> Vec<PathBuf> {
+fn pdf_engine_candidates(resource_dir: Option<PathBuf>, name: &str) -> Vec<PathBuf> {
+    let executable = if cfg!(windows) {
+        format!("{name}.exe")
+    } else {
+        name.to_string()
+    };
     let bundle = Path::new("pdf-engine-dist")
         .join("minos-pdf")
-        .join(PDF_ENGINE_EXE);
+        .join(name)
+        .join(executable);
     let mut candidates: Vec<PathBuf> = resource_dir
         .into_iter()
         .map(|dir| dir.join(&bundle))
@@ -86,8 +90,8 @@ fn pdf_engine_candidates(resource_dir: Option<PathBuf>) -> Vec<PathBuf> {
     candidates
 }
 
-fn find_pdf_engine(app: &AppHandle) -> Option<PathBuf> {
-    pdf_engine_candidates(app.path().resource_dir().ok())
+fn find_pdf_engine(app: &AppHandle, name: &str) -> Option<PathBuf> {
+    pdf_engine_candidates(app.path().resource_dir().ok(), name)
         .into_iter()
         .find(|path| path.is_file())
 }
@@ -523,7 +527,8 @@ async fn blocking<T: Send + 'static>(
 pub async fn convert_engine(app: AppHandle) -> AppResult<EngineInfo> {
     blocking(move || {
         Ok(EngineInfo {
-            pdf_engine: find_pdf_engine(&app).is_some(),
+            pdf_engine: find_pdf_engine(&app, TO_DOCX).is_some()
+                && find_pdf_engine(&app, TO_PDF).is_some(),
         })
     })
     .await
@@ -536,7 +541,7 @@ pub async fn convert_pdf_to_word(app: AppHandle, path: String) -> AppResult<Conv
             &path,
             "docx",
             "pdf-to-docx",
-            find_pdf_engine(&app).as_deref(),
+            find_pdf_engine(&app, TO_DOCX).as_deref(),
             basic_pdf_to_docx,
         )
     })
@@ -550,7 +555,7 @@ pub async fn convert_word_to_pdf(app: AppHandle, path: String) -> AppResult<Conv
             &path,
             "pdf",
             "docx-to-pdf",
-            find_pdf_engine(&app).as_deref(),
+            find_pdf_engine(&app, TO_PDF).as_deref(),
             basic_docx_to_pdf,
         )
     })
@@ -589,9 +594,14 @@ mod tests {
     #[test]
     fn looks_for_the_packaged_engine_first() {
         let resources = PathBuf::from("resources");
-        let candidates = pdf_engine_candidates(Some(resources.clone()));
+        let candidates = pdf_engine_candidates(Some(resources.clone()), TO_PDF);
         assert!(candidates[0].starts_with(&resources));
-        assert!(candidates[0].ends_with(Path::new("minos-pdf").join(PDF_ENGINE_EXE)));
+        let executable = if cfg!(windows) {
+            "minos-to-pdf.exe"
+        } else {
+            "minos-to-pdf"
+        };
+        assert!(candidates[0].ends_with(Path::new(TO_PDF).join(executable)));
     }
 
     #[test]
@@ -617,10 +627,13 @@ mod tests {
     #[test]
     #[ignore = "needs the engine built by pdf-engine/build.py"]
     fn converts_both_ways_with_the_real_engine_and_an_accented_path() {
-        let engine = pdf_engine_candidates(None)
-            .into_iter()
-            .find(|path| path.is_file())
-            .expect("build the engine first");
+        let find = |name| {
+            pdf_engine_candidates(None, name)
+                .into_iter()
+                .find(|path| path.is_file())
+                .expect("build the engine first")
+        };
+        let (to_docx, to_pdf) = (find(TO_DOCX), find(TO_PDF));
         let dir = tempfile::tempdir().unwrap();
         let docx = dir.path().join("in.docx");
         let pdf = dir.path().join("Documentación señor ñ.pdf");
@@ -631,7 +644,7 @@ mod tests {
             pdf.to_str().unwrap(),
             "docx",
             "pdf-to-docx",
-            Some(&engine),
+            Some(&to_docx),
             basic_pdf_to_docx,
         )
         .unwrap();
@@ -643,7 +656,7 @@ mod tests {
             accented_docx.to_str().unwrap(),
             "pdf",
             "docx-to-pdf",
-            Some(&engine),
+            Some(&to_pdf),
             basic_docx_to_pdf,
         )
         .unwrap();
@@ -651,8 +664,13 @@ mod tests {
 
         let corrupt = dir.path().join("corrupto.pdf");
         fs::write(&corrupt, b"not a pdf").unwrap();
-        let error = run_pdf_engine(&engine, "pdf-to-docx", &corrupt, &dir.path().join("x.docx"))
-            .unwrap_err();
+        let error = run_pdf_engine(
+            &to_docx,
+            "pdf-to-docx",
+            &corrupt,
+            &dir.path().join("x.docx"),
+        )
+        .unwrap_err();
         assert_eq!(error.code, ErrorCode::InvalidPdf);
 
         let legacy = dir.path().join("antiguo.doc");
@@ -661,7 +679,7 @@ mod tests {
             legacy.to_str().unwrap(),
             "pdf",
             "docx-to-pdf",
-            Some(&engine),
+            Some(&to_pdf),
             basic_docx_to_pdf,
         )
         .unwrap_err();

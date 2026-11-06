@@ -12,25 +12,15 @@ runs:
       with:
         python-version: "3.12"
 
+    # `update` refreshes the package index: the one in the runner's image goes stale,
+    # and it then asks for files the mirrors no longer have.
     - uses: msys2/setup-msys2@v2
       if: runner.os == 'Windows'
       id: msys2
       with:
         msystem: UCRT64
-        update: false
+        update: true
         install: mingw-w64-ucrt-x86_64-pango
-
-    - name: Install Pango (Linux)
-      if: runner.os == 'Linux'
-      shell: bash
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
-
-    - name: Install Pango (macOS)
-      if: runner.os == 'macOS'
-      shell: bash
-      run: brew install pango
 
     # Pango's folder is only on the path for this step: MSYS2 also brings its own Python
     # and tools, which mustn't replace the runner's in the steps after this one.
@@ -40,9 +30,31 @@ runs:
         PYTHON: ${{ steps.python.outputs.python-path }}
         MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
       run: |
-        "$PYTHON" -m pip install -r pdf-engine/requirements.in -r pdf-engine/requirements-dev.txt
-        case "$RUNNER_OS" in
-          Windows) export PATH="$(cygpath -u "$MSYS2_LOCATION")/ucrt64/bin:$PATH" ;;
-          macOS) export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib" ;;
-        esac
-        "$PYTHON" pdf-engine/build.py
+        log="$RUNNER_TEMP/pdf-engine.log"
+        build() {
+          set -e
+          case "$RUNNER_OS" in
+            Linux)
+              sudo apt-get update
+              sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+              ;;
+            macOS)
+              brew install pango
+              export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib"
+              ;;
+          esac
+          "$PYTHON" -m pip install -r pdf-engine/requirements.in -r pdf-engine/requirements-dev.txt
+          if [ "$RUNNER_OS" = Windows ]; then
+            export PATH="$(cygpath -u "$MSYS2_LOCATION")/ucrt64/bin:$PATH"
+          fi
+          "$PYTHON" pdf-engine/build.py
+        }
+        if (build) >"$log" 2>&1; then
+          tail -n 5 "$log"
+        else
+          cat "$log"
+          # An annotation, so that the cause shows up without opening the full log.
+          summary="$(tail -n 25 "$log" | cut -c1-200 | sed -e 's/%/%25/g' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/%0A/g')"
+          echo "::error title=PDF engine build failed::$summary"
+          exit 1
+        fi

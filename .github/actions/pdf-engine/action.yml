@@ -31,19 +31,19 @@ runs:
         MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
       run: |
         log="$RUNNER_TEMP/pdf-engine.log"
+        # Each failure returns explicitly: `set -e` has no effect in a function run by `if`.
         build() {
-          set -e
           case "$RUNNER_OS" in
             Linux)
-              sudo apt-get update
-              sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+              sudo apt-get update || return 1
+              sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 || return 1
               ;;
             macOS)
-              brew install pango
+              brew install pango || return 1
               export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib"
               ;;
           esac
-          "$PYTHON" -m pip install -r pdf-engine/requirements.in -r pdf-engine/requirements-dev.txt
+          "$PYTHON" -m pip install -r pdf-engine/requirements.in -r pdf-engine/requirements-dev.txt || return 1
           if [ "$RUNNER_OS" = Windows ]; then
             export PATH="$(cygpath -u "$MSYS2_LOCATION")/ucrt64/bin:$PATH"
           fi

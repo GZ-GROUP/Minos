@@ -54,7 +54,7 @@ runs:
         else
           cat "$log"
           # An annotation, so that the cause shows up without opening the full log.
-          summary="$(tail -n 25 "$log" | cut -c1-200 | sed -e 's/%/%25/g' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/%0A/g')"
+          summary="$(tail -n 12 "$log" | cut -c1-1500 | sed -e 's/%/%25/g' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/%0A/g')"
           echo "::error title=PDF engine build failed::$summary"
           exit 1
         fi

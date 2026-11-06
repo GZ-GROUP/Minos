@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CaretRight, Globe, Info, Moon, Sun } from "@phosphor-icons/react";
+import { CaretRight, Globe, Info, Moon, Storefront, Sun } from "@phosphor-icons/react";
 import logo from "../assets/logo.png";
 import { useTheme } from "../theme/ThemeProvider";
 import { Switch } from "./Switch";
@@ -8,8 +8,12 @@ import { LanguageSelect } from "./LanguageSelect";
 import { AboutModal } from "./AboutModal";
 import "./AppMenu.css";
 
-/** Logo button that toggles a settings popover (theme, language, about). */
-export function AppMenu() {
+interface AppMenuProps {
+  onOpenMarketplace: () => void;
+}
+
+/** Logo button that toggles a popover (Marketplace, theme, language, about). */
+export function AppMenu({ onOpenMarketplace }: AppMenuProps) {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
@@ -43,6 +47,13 @@ export function AppMenu() {
     };
   }, [open]);
 
+  const openMarketplace = () => {
+    setOpen(false);
+    // The row is about to hide: the modal restores focus to the logo when it closes.
+    triggerRef.current?.focus();
+    onOpenMarketplace();
+  };
+
   const openAbout = () => {
     setOpen(false);
     setAboutOpen(true);
@@ -68,6 +79,14 @@ export function AppMenu() {
       </button>
 
       <div id={panelId} className="app-menu__panel clay" data-open={open} hidden={!open}>
+        <button type="button" className="app-menu__row app-menu__row--action" onClick={openMarketplace}>
+          <span className="app-menu__label">
+            <Storefront aria-hidden="true" />
+            {t("menu.marketplace")}
+          </span>
+          <CaretRight className="app-menu__chevron" weight="bold" aria-hidden="true" />
+        </button>
+
         <div className="app-menu__row">
           <span id={darkLabelId} className="app-menu__label">
             {theme === "dark" ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}

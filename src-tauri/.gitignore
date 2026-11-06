@@ -6,5 +6,10 @@
 # will have schema files for capabilities auto-completion
 /gen/schemas
 
+# Built by pdf-engine/build.py. The placeholder stays because Tauri needs the resource
+# folder to exist even when the engine hasn't been built.
+/pdf-engine-dist/minos-pdf/*
+!/pdf-engine-dist/minos-pdf/.gitkeep
+
 # Machine-specific Cargo settings (e.g. a target-dir outside OneDrive)
 /.cargo/config.toml

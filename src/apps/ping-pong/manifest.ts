@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "ping-pong",
   icon: PingPong,
-  order: 12,
+  category: "network",
 } satisfies AppManifest;

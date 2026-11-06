@@ -1,0 +1,10 @@
+[package]
+name = "hello-backend"
+version = "1.0.0"
+edition = "2024"
+
+[dependencies]
+serde_json = "1"
+
+# Keeps this example independent from any Cargo workspace around it.
+[workspace]

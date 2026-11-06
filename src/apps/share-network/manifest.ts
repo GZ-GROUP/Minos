@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "share-network",
   icon: ShareNetwork,
-  order: 5,
+  category: "network",
 } satisfies AppManifest;

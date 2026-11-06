@@ -1,9 +1,12 @@
 mod apps;
+mod marketplace;
 
 use apps::ping_pong::PingState;
 use apps::processes::SystemState;
 use apps::share_network::ShareState;
 use apps::share_scp::ScpState;
+use marketplace::MarketplaceState;
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -14,7 +17,20 @@ pub fn run() {
         .manage(PingState::default())
         .manage(ShareState::default())
         .manage(ScpState::default())
+        .setup(|app| {
+            let app_data_dir = app.path().app_data_dir()?;
+            app.manage(MarketplaceState::open(app_data_dir));
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
+            marketplace::marketplace_state,
+            marketplace::marketplace_catalog,
+            marketplace::marketplace_set_installed,
+            marketplace::marketplace_set_order,
+            marketplace::marketplace_add_repository,
+            marketplace::marketplace_add_zip,
+            marketplace::marketplace_download,
+            marketplace::marketplace_remove,
             apps::processes::processes_list,
             apps::my_pc::my_pc_info,
             apps::my_network::network_adapters,

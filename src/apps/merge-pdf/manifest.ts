@@ -4,5 +4,5 @@ import type { AppManifest } from "../types";
 export default {
   id: "merge-pdf",
   icon: ArrowsMerge,
-  order: 4,
+  category: "documents",
 } satisfies AppManifest;

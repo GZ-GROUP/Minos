@@ -2,6 +2,7 @@
   "appName": "Minos",
   "menu": {
     "open": "Abrir menú",
+    "marketplace": "Marketplace",
     "darkMode": "Modo oscuro",
     "language": "Idioma",
     "about": "Acerca de"
@@ -19,7 +20,55 @@
     "page": "Página {{page}} de {{total}}",
     "previous": "Página anterior",
     "next": "Página siguiente",
-    "empty": "Aún no hay aplicaciones instaladas."
+    "emptyTitle": "Aún no hay aplicaciones instaladas",
+    "emptyBody": "Elige las herramientas que quieres usar en el Marketplace y aparecerán aquí.",
+    "openMarketplace": "Abrir Marketplace"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "search": "Buscar aplicaciones…",
+    "close": "Cerrar Marketplace",
+    "categoriesLabel": "Categorías",
+    "categories": {
+      "all": "Todas",
+      "documents": "Documentos",
+      "files": "Archivos",
+      "system": "Sistema",
+      "network": "Red",
+      "utilities": "Utilidades"
+    },
+    "included": "Incluida en Minos",
+    "localZip": "Archivo .zip local",
+    "emptyCategory": "No hay aplicaciones en esta categoría.",
+    "offline": "No se pudo leer el catálogo en línea. Se muestran solo las aplicaciones disponibles en este equipo.",
+    "onlyFor": "Solo para {{platforms}}",
+    "status": {
+      "installed": "Instalada",
+      "downloaded": "Descargada",
+      "installSoon": "Se validó y se guardó en este equipo. Podrás instalarla en una próxima versión de Minos."
+    },
+    "action": {
+      "install": "Instalar",
+      "uninstall": "Desinstalar",
+      "download": "Descargar",
+      "downloading": "Descargando {{name}}",
+      "remove": "Eliminar {{name}}"
+    },
+    "remove": {
+      "title": "¿Eliminar {{name}}?",
+      "downloaded": "Se borrará el paquete descargado de este equipo.",
+      "added": "Dejará de aparecer en tu lista. Puedes volver a agregarla con su enlace.",
+      "confirm": "Eliminar"
+    },
+    "add": {
+      "open": "Agregar",
+      "title": "Agregar aplicación",
+      "linkLabel": "Enlace del repositorio de GitHub",
+      "linkHint": "Debe ser un módulo de Minos con un Release publicado. También puedes cargar su paquete .zip.",
+      "submit": "Agregar",
+      "chooseZip": "Elegir .zip",
+      "zipFilter": "Paquete de módulo"
+    }
   },
   "appView": {
     "back": "Volver",
@@ -75,10 +124,8 @@
     "working": "Procesando…"
   },
   "convert": {
-    "libreoffice": "LibreOffice",
-    "libreofficeHint": "Conversión fiel con LibreOffice.",
     "basic": "Modo básico · solo texto",
-    "basicHint": "LibreOffice no está instalado, así que solo se convierte el texto. Instala LibreOffice para conservar formato, imágenes y tablas.",
+    "basicHint": "El motor de conversión no está disponible, así que solo se convierte el texto. Reinstala Minos para conservar formato, imágenes y tablas.",
     "usedBasic": "Convertido en modo básico: solo se conservó el texto."
   },
   "errors": {
@@ -92,12 +139,16 @@
     "not_empty": "La carpeta no está vacía.",
     "invalid_pdf": "El archivo no es un PDF válido o está protegido con contraseña.",
     "conversion_failed": "No se pudo convertir el archivo.",
-    "unsupported_format": "Ese tipo de archivo no se puede convertir sin LibreOffice.",
+    "unsupported_format": "Solo se pueden convertir archivos .docx. Guarda el documento como .docx e inténtalo de nuevo.",
     "unreachable": "No se puede conectar con el servidor.",
     "auth_failed": "Usuario o contraseña incorrectos.",
     "host_key_changed": "La identidad del servidor cambió. Puede significar que alguien está interceptando la conexión.",
     "not_connected": "No estás conectado.",
     "timeout": "La operación tardó demasiado.",
+    "invalid_repository_url": "Ese enlace no es válido.",
+    "invalid_module": "No es un módulo válido de Minos.",
+    "unsupported_platform": "Este módulo no es compatible con tu sistema operativo.",
+    "rate_limited": "GitHub limitó las consultas. Inténtalo de nuevo en un rato.",
     "io": "No se pudo completar la operación."
   },
   "numeric": {

@@ -43,8 +43,32 @@
 }
 
 .app-drawer__grid li {
+  position: relative;
   min-width: 0;
   min-height: 0;
+}
+
+/* Reordering: siblings glide to their new cells; the lifted tile follows the pointer. */
+.app-drawer__grid li[data-reordering] {
+  transition: transform var(--duration-base) var(--ease-squish);
+}
+
+.app-drawer__grid li[data-lifted] {
+  z-index: 2;
+}
+
+.app-drawer__grid li[data-following] {
+  transition: none;
+  cursor: grabbing;
+}
+
+.app-drawer__grid li[data-following] .app-tile,
+.app-drawer__grid li[data-following] .app-tile:hover,
+.app-drawer__grid li[data-following] .app-tile:active {
+  transform: scale(1.06);
+  box-shadow: var(--clay-shadow-hover);
+  background: var(--color-surface-raised);
+  cursor: grabbing;
 }
 
 .app-drawer__dots {
@@ -74,6 +98,39 @@
 }
 
 .app-drawer__empty {
-  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  height: 100%;
+  text-align: center;
   color: var(--color-text-muted);
+}
+
+.app-drawer__empty p {
+  max-width: 420px;
+  margin: 0;
+}
+
+.app-drawer__empty h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--text-lg);
+}
+
+.app-drawer__empty .button {
+  margin-top: var(--space-2);
+}
+
+.app-drawer__empty-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--clay-shadow-inset);
+  color: var(--color-icon);
+  font-size: 40px;
 }

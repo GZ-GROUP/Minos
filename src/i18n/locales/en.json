@@ -2,6 +2,7 @@
   "appName": "Minos",
   "menu": {
     "open": "Open menu",
+    "marketplace": "Marketplace",
     "darkMode": "Dark mode",
     "language": "Language",
     "about": "About"
@@ -19,7 +20,55 @@
     "page": "Page {{page}} of {{total}}",
     "previous": "Previous page",
     "next": "Next page",
-    "empty": "No apps installed yet."
+    "emptyTitle": "No apps installed yet",
+    "emptyBody": "Choose the tools you want to use in the Marketplace and they'll appear here.",
+    "openMarketplace": "Open Marketplace"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "search": "Search apps…",
+    "close": "Close Marketplace",
+    "categoriesLabel": "Categories",
+    "categories": {
+      "all": "All",
+      "documents": "Documents",
+      "files": "Files",
+      "system": "System",
+      "network": "Network",
+      "utilities": "Utilities"
+    },
+    "included": "Included in Minos",
+    "localZip": "Local .zip file",
+    "emptyCategory": "There are no apps in this category.",
+    "offline": "The online catalog couldn't be read. Only the apps available on this device are shown.",
+    "onlyFor": "Only for {{platforms}}",
+    "status": {
+      "installed": "Installed",
+      "downloaded": "Downloaded",
+      "installSoon": "It was validated and saved on this device. You'll be able to install it in a future version of Minos."
+    },
+    "action": {
+      "install": "Install",
+      "uninstall": "Uninstall",
+      "download": "Download",
+      "downloading": "Downloading {{name}}",
+      "remove": "Remove {{name}}"
+    },
+    "remove": {
+      "title": "Remove {{name}}?",
+      "downloaded": "The downloaded package will be deleted from this device.",
+      "added": "It will no longer appear in your list. You can add it again with its link.",
+      "confirm": "Remove"
+    },
+    "add": {
+      "open": "Add",
+      "title": "Add an app",
+      "linkLabel": "GitHub repository link",
+      "linkHint": "It must be a Minos module with a published Release. You can also load its .zip package.",
+      "submit": "Add",
+      "chooseZip": "Choose .zip",
+      "zipFilter": "Module package"
+    }
   },
   "appView": {
     "back": "Back",
@@ -75,10 +124,8 @@
     "working": "Working…"
   },
   "convert": {
-    "libreoffice": "LibreOffice",
-    "libreofficeHint": "Full-fidelity conversion with LibreOffice.",
     "basic": "Basic mode · text only",
-    "basicHint": "LibreOffice isn’t installed, so only the text is converted. Install LibreOffice to keep formatting, images and tables.",
+    "basicHint": "The conversion engine isn’t available, so only the text is converted. Reinstall Minos to keep formatting, images and tables.",
     "usedBasic": "Converted in basic mode: only the text was kept."
   },
   "errors": {
@@ -92,12 +139,16 @@
     "not_empty": "The folder isn’t empty.",
     "invalid_pdf": "The file isn’t a valid PDF, or it’s password-protected.",
     "conversion_failed": "The file couldn’t be converted.",
-    "unsupported_format": "That file type can’t be converted without LibreOffice.",
+    "unsupported_format": "Only .docx files can be converted. Save the document as .docx and try again.",
     "unreachable": "The server can’t be reached.",
     "auth_failed": "Wrong user or password.",
     "host_key_changed": "The server’s identity changed. This can mean someone is intercepting the connection.",
     "not_connected": "You’re not connected.",
     "timeout": "The operation took too long.",
+    "invalid_repository_url": "That link isn't valid.",
+    "invalid_module": "This isn't a valid Minos module.",
+    "unsupported_platform": "This module doesn't support your operating system.",
+    "rate_limited": "GitHub limited the requests. Try again in a while.",
     "io": "The operation couldn’t be completed."
   },
   "numeric": {

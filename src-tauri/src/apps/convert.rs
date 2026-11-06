@@ -1,154 +1,167 @@
 //! PDF ↔ Word conversion.
 //!
-//! LibreOffice (headless) gives faithful results when installed; otherwise a
-//! pure-Rust fallback keeps the text only. Both paths work on every OS.
+//! Both directions use the PDF engine (`pdf-engine/`), which ships with the app. If it
+//! can't run or fails on a file, a pure-Rust fallback keeps the text only.
 
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, ExitStatus, Stdio};
 use std::time::{Duration, Instant};
 
 use lopdf::content::{Content, Operation};
 use lopdf::{Document, Object, Stream, StringFormat, dictionary};
 use quick_xml::events::Event;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use tauri::{AppHandle, Manager};
 
 use super::error::{AppError, AppResult, ErrorCode};
 use super::file_io::{FileInfo, file_stem, new_output_dir};
 
-const LIBREOFFICE_TIMEOUT: Duration = Duration::from_secs(180);
+const PDF_ENGINE_TIMEOUT: Duration = Duration::from_secs(300);
+// One bundle per direction, since their libraries conflict; see `pdf-engine/build.py`.
+const TO_DOCX: &str = "minos-to-docx";
+const TO_PDF: &str = "minos-to-pdf";
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EngineInfo {
-    libreoffice: bool,
+    pdf_engine: bool,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConversionResult {
     file: FileInfo,
-    /// "libreoffice" | "basic"
+    /// "minos" | "basic"
     engine: &'static str,
 }
 
-// ── LibreOffice ──────────────────────────────────────────────
-
-fn find_soffice() -> Option<PathBuf> {
-    let names: &[&str] = if cfg!(windows) {
-        &["soffice.exe"]
-    } else {
-        &["soffice", "libreoffice"]
-    };
-    let on_path = std::env::var_os("PATH").into_iter().flat_map(|paths| {
-        std::env::split_paths(&paths)
-            .flat_map(|dir| names.iter().map(move |name| dir.join(name)))
-            .collect::<Vec<_>>()
-    });
-
-    let mut known: Vec<PathBuf> = Vec::new();
-    if cfg!(windows) {
-        for variable in ["ProgramFiles", "ProgramFiles(x86)", "ProgramW6432"] {
-            if let Some(base) = std::env::var_os(variable) {
-                known.push(PathBuf::from(base).join(r"LibreOffice\program\soffice.exe"));
-            }
+/// Waits for a converter, killing it if it takes too long.
+fn wait_with_timeout(child: &mut Child, timeout: Duration, name: &str) -> AppResult<ExitStatus> {
+    let started = Instant::now();
+    loop {
+        if let Some(status) = child.try_wait()? {
+            return Ok(status);
         }
-    } else if cfg!(target_os = "macos") {
-        known.push("/Applications/LibreOffice.app/Contents/MacOS/soffice".into());
-    } else {
-        for path in [
-            "/usr/bin/soffice",
-            "/usr/lib/libreoffice/program/soffice",
-            "/opt/libreoffice/program/soffice",
-            "/snap/bin/libreoffice",
-            "/var/lib/flatpak/exports/bin/org.libreoffice.LibreOffice",
-        ] {
-            known.push(path.into());
+        if started.elapsed() > timeout {
+            let _ = child.kill();
+            return Err(AppError::new(
+                ErrorCode::Timeout,
+                format!("{name} took too long"),
+            ));
         }
-    }
-
-    on_path.chain(known).find(|candidate| candidate.is_file())
-}
-
-/// `file:///` URL for LibreOffice's `-env:UserInstallation`, percent-encoded.
-fn file_url(path: &Path) -> String {
-    let text = path.to_string_lossy().replace('\\', "/");
-    let encoded: String = text
-        .bytes()
-        .map(|byte| match byte {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'/' | b':' | b'-' | b'_' | b'.' | b'~' => {
-                (byte as char).to_string()
-            }
-            other => format!("%{other:02X}"),
-        })
-        .collect();
-    if encoded.starts_with('/') {
-        format!("file://{encoded}")
-    } else {
-        format!("file:///{encoded}")
+        std::thread::sleep(Duration::from_millis(200));
     }
 }
 
-/// Runs `soffice --convert-to` with a private profile (so an already open
-/// LibreOffice window doesn't swallow the job) and a timeout.
-fn run_libreoffice(
-    soffice: &Path,
-    input: &Path,
-    out_dir: &Path,
-    convert_to: &str,
-    infilter: Option<&str>,
-    extension: &str,
-) -> AppResult<PathBuf> {
-    let profile = std::env::temp_dir().join("minos-libreoffice-profile");
-    let mut command = Command::new(soffice);
-    command
-        .arg(format!("-env:UserInstallation={}", file_url(&profile)))
-        .args(["--headless", "--norestore", "--nolockcheck", "--nodefault"]);
-    if let Some(filter) = infilter {
-        command.arg(format!("--infilter={filter}"));
-    }
-    command
-        .args(["--convert-to", convert_to, "--outdir"])
-        .arg(out_dir)
-        .arg(input)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped());
+fn hide_console(command: &mut Command) {
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
         const CREATE_NO_WINDOW: u32 = 0x0800_0000;
         command.creation_flags(CREATE_NO_WINDOW);
     }
+    #[cfg(not(windows))]
+    let _ = command;
+}
+
+// ── PDF engine ───────────────────────────────────────────────
+
+/// Where the engine may be: packaged with the app, or built for development by
+/// `pdf-engine/build.py`.
+fn pdf_engine_candidates(resource_dir: Option<PathBuf>, name: &str) -> Vec<PathBuf> {
+    let executable = if cfg!(windows) {
+        format!("{name}.exe")
+    } else {
+        name.to_string()
+    };
+    let bundle = Path::new("pdf-engine-dist")
+        .join("minos-pdf")
+        .join(name)
+        .join(executable);
+    let mut candidates: Vec<PathBuf> = resource_dir
+        .into_iter()
+        .map(|dir| dir.join(&bundle))
+        .collect();
+    if cfg!(debug_assertions) {
+        candidates.push(Path::new(env!("CARGO_MANIFEST_DIR")).join(&bundle));
+    }
+    candidates
+}
+
+fn find_pdf_engine(app: &AppHandle, name: &str) -> Option<PathBuf> {
+    pdf_engine_candidates(app.path().resource_dir().ok(), name)
+        .into_iter()
+        .find(|path| path.is_file())
+}
+
+#[derive(Debug, Deserialize)]
+struct PdfEngineReport {
+    ok: bool,
+    #[serde(default)]
+    code: String,
+    #[serde(default)]
+    message: String,
+}
+
+/// The engine reports on its last line of stdout; libraries may log above it.
+fn parse_pdf_engine_report(stdout: &str) -> AppResult<()> {
+    let report = stdout
+        .lines()
+        .rev()
+        .find(|line| !line.trim().is_empty())
+        .and_then(|line| serde_json::from_str::<PdfEngineReport>(line).ok())
+        .ok_or_else(|| {
+            AppError::new(
+                ErrorCode::ConversionFailed,
+                "the PDF engine didn't report a result",
+            )
+        })?;
+    if report.ok {
+        return Ok(());
+    }
+    let code = match report.code.as_str() {
+        "invalid_pdf" => ErrorCode::InvalidPdf,
+        "unsupported_format" => ErrorCode::UnsupportedFormat,
+        _ => ErrorCode::ConversionFailed,
+    };
+    Err(AppError::new(code, report.message))
+}
+
+fn run_pdf_engine(engine: &Path, conversion: &str, input: &Path, output: &Path) -> AppResult<()> {
+    let mut command = Command::new(engine);
+    command
+        .arg(conversion)
+        .arg("--input")
+        .arg(input)
+        .arg("--output")
+        .arg(output)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null());
+    hide_console(&mut command);
 
     let mut child = command.spawn()?;
-    let started = Instant::now();
-    let status = loop {
-        if let Some(status) = child.try_wait()? {
-            break status;
+    // Read while it runs: a full pipe would otherwise block it until the timeout.
+    let mut pipe = child.stdout.take();
+    let reader = std::thread::spawn(move || {
+        let mut bytes = Vec::new();
+        if let Some(pipe) = pipe.as_mut() {
+            let _ = pipe.read_to_end(&mut bytes);
         }
-        if started.elapsed() > LIBREOFFICE_TIMEOUT {
-            let _ = child.kill();
-            return Err(AppError::new(
-                ErrorCode::Timeout,
-                "LibreOffice took too long",
-            ));
-        }
-        std::thread::sleep(Duration::from_millis(200));
-    };
+        bytes
+    });
+    wait_with_timeout(&mut child, PDF_ENGINE_TIMEOUT, "The PDF engine")?;
+    let stdout = reader.join().unwrap_or_default();
 
-    let output = out_dir.join(format!("{}.{extension}", file_stem(input)));
-    if status.success() && output.is_file() {
-        Ok(output)
+    parse_pdf_engine_report(&String::from_utf8_lossy(&stdout))?;
+    if output.is_file() {
+        Ok(())
     } else {
-        let mut stderr = String::new();
-        if let Some(mut pipe) = child.stderr.take() {
-            let _ = pipe.read_to_string(&mut stderr);
-        }
         Err(AppError::new(
             ErrorCode::ConversionFailed,
-            format!("LibreOffice couldn't convert the file. {}", stderr.trim()),
+            "the PDF engine didn't write the document",
         ))
     }
 }
@@ -459,7 +472,7 @@ fn basic_docx_to_pdf(input: &Path, output: &Path) -> AppResult<()> {
     if !is_docx {
         return Err(AppError::new(
             ErrorCode::UnsupportedFormat,
-            "without LibreOffice only .docx files can be converted",
+            "only .docx files can be converted; save it as .docx first",
         ));
     }
     write_text_pdf(&read_docx_blocks(input)?, output)
@@ -467,40 +480,38 @@ fn basic_docx_to_pdf(input: &Path, output: &Path) -> AppResult<()> {
 
 // ── Commands ─────────────────────────────────────────────────
 
-/// LibreOffice first; on failure (or when missing) the basic converter.
+/// The PDF engine; on failure (or when it's missing) the basic converter.
 fn convert(
     input: &str,
     extension: &'static str,
-    convert_to: &str,
-    infilter: Option<&str>,
+    conversion: &str,
+    pdf_engine: Option<&Path>,
     basic: fn(&Path, &Path) -> AppResult<()>,
 ) -> AppResult<ConversionResult> {
     let input = Path::new(input);
     let out_dir = new_output_dir()?;
+    let output = out_dir.join(format!("{}.{extension}", file_stem(input)));
 
-    let libreoffice_error = match find_soffice() {
-        Some(soffice) => {
-            match run_libreoffice(&soffice, input, &out_dir, convert_to, infilter, extension) {
-                Ok(output) => {
-                    return Ok(ConversionResult {
-                        file: FileInfo::read(&output)?,
-                        engine: "libreoffice",
-                    });
-                }
-                Err(error) => Some(error),
+    let pdf_engine_error = match pdf_engine {
+        Some(engine) => match run_pdf_engine(engine, conversion, input, &output) {
+            Ok(()) => {
+                return Ok(ConversionResult {
+                    file: FileInfo::read(&output)?,
+                    engine: "minos",
+                });
             }
-        }
+            Err(error) => Some(error),
+        },
         None => None,
     };
 
-    let output = out_dir.join(format!("{}.{extension}", file_stem(input)));
     match basic(input, &output) {
         Ok(()) => Ok(ConversionResult {
             file: FileInfo::read(&output)?,
             engine: "basic",
         }),
-        // Prefer LibreOffice's error: it's the engine the user expected to run.
-        Err(error) => Err(libreoffice_error.unwrap_or(error)),
+        // Prefer the error of the engine the user expected to run.
+        Err(error) => Err(pdf_engine_error.unwrap_or(error)),
     }
 }
 
@@ -513,23 +524,24 @@ async fn blocking<T: Send + 'static>(
 }
 
 #[tauri::command]
-pub async fn convert_engine() -> AppResult<EngineInfo> {
-    blocking(|| {
+pub async fn convert_engine(app: AppHandle) -> AppResult<EngineInfo> {
+    blocking(move || {
         Ok(EngineInfo {
-            libreoffice: find_soffice().is_some(),
+            pdf_engine: find_pdf_engine(&app, TO_DOCX).is_some()
+                && find_pdf_engine(&app, TO_PDF).is_some(),
         })
     })
     .await
 }
 
 #[tauri::command]
-pub async fn convert_pdf_to_word(path: String) -> AppResult<ConversionResult> {
+pub async fn convert_pdf_to_word(app: AppHandle, path: String) -> AppResult<ConversionResult> {
     blocking(move || {
         convert(
             &path,
             "docx",
-            r#"docx:MS Word 2007 XML"#,
-            Some("writer_pdf_import"),
+            "pdf-to-docx",
+            find_pdf_engine(&app, TO_DOCX).as_deref(),
             basic_pdf_to_docx,
         )
     })
@@ -537,13 +549,160 @@ pub async fn convert_pdf_to_word(path: String) -> AppResult<ConversionResult> {
 }
 
 #[tauri::command]
-pub async fn convert_word_to_pdf(path: String) -> AppResult<ConversionResult> {
-    blocking(move || convert(&path, "pdf", "pdf", None, basic_docx_to_pdf)).await
+pub async fn convert_word_to_pdf(app: AppHandle, path: String) -> AppResult<ConversionResult> {
+    blocking(move || {
+        convert(
+            &path,
+            "pdf",
+            "docx-to-pdf",
+            find_pdf_engine(&app, TO_PDF).as_deref(),
+            basic_docx_to_pdf,
+        )
+    })
+    .await
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn reads_the_engine_report_from_its_last_line() {
+        assert!(parse_pdf_engine_report("[INFO] page 1\n{\"ok\": true}\n\n").is_ok());
+
+        let error = parse_pdf_engine_report(
+            r#"{"ok": false, "code": "invalid_pdf", "message": "password-protected"}"#,
+        )
+        .unwrap_err();
+        assert_eq!(error.code, ErrorCode::InvalidPdf);
+        assert_eq!(error.message, "password-protected");
+
+        let error =
+            parse_pdf_engine_report(r#"{"ok": false, "code": "conversion_failed"}"#).unwrap_err();
+        assert_eq!(error.code, ErrorCode::ConversionFailed);
+
+        for broken in [
+            "",
+            "Traceback (most recent call last):",
+            "{\"ok\": true}\ncrash",
+        ] {
+            let error = parse_pdf_engine_report(broken).unwrap_err();
+            assert_eq!(error.code, ErrorCode::ConversionFailed, "{broken:?}");
+        }
+    }
+
+    #[test]
+    fn looks_for_the_packaged_engine_first() {
+        let resources = PathBuf::from("resources");
+        let candidates = pdf_engine_candidates(Some(resources.clone()), TO_PDF);
+        assert!(candidates[0].starts_with(&resources));
+        let executable = if cfg!(windows) {
+            "minos-to-pdf.exe"
+        } else {
+            "minos-to-pdf"
+        };
+        assert!(candidates[0].ends_with(Path::new(TO_PDF).join(executable)));
+    }
+
+    #[test]
+    fn falls_back_when_the_engine_cannot_run() {
+        let dir = tempfile::tempdir().unwrap();
+        let docx = dir.path().join("in.docx");
+        let pdf = dir.path().join("in.pdf");
+        write_docx(&[vec!["Hola".into()]], &docx).unwrap();
+        basic_docx_to_pdf(&docx, &pdf).unwrap();
+
+        let missing = dir.path().join("no-engine.exe");
+        let result = convert(
+            pdf.to_str().unwrap(),
+            "docx",
+            "pdf-to-docx",
+            Some(&missing),
+            basic_pdf_to_docx,
+        )
+        .unwrap();
+        assert_eq!(result.engine, "basic");
+    }
+
+    #[test]
+    #[ignore = "needs the engine built by pdf-engine/build.py"]
+    fn converts_both_ways_with_the_real_engine_and_an_accented_path() {
+        let find = |name| {
+            pdf_engine_candidates(None, name)
+                .into_iter()
+                .find(|path| path.is_file())
+                .expect("build the engine first")
+        };
+        let (to_docx, to_pdf) = (find(TO_DOCX), find(TO_PDF));
+        let dir = tempfile::tempdir().unwrap();
+        let docx = dir.path().join("in.docx");
+        let pdf = dir.path().join("Documentación señor ñ.pdf");
+        write_docx(&[vec!["Hola señor".into()]], &docx).unwrap();
+        basic_docx_to_pdf(&docx, &pdf).unwrap();
+
+        let result = convert(
+            pdf.to_str().unwrap(),
+            "docx",
+            "pdf-to-docx",
+            Some(&to_docx),
+            basic_pdf_to_docx,
+        )
+        .unwrap();
+        assert_eq!(result.engine, "minos");
+
+        let accented_docx = dir.path().join("Informe señor ñ.docx");
+        fs::copy(&docx, &accented_docx).unwrap();
+        let result = convert(
+            accented_docx.to_str().unwrap(),
+            "pdf",
+            "docx-to-pdf",
+            Some(&to_pdf),
+            basic_docx_to_pdf,
+        )
+        .unwrap();
+        assert_eq!(result.engine, "minos");
+
+        let corrupt = dir.path().join("corrupto.pdf");
+        fs::write(&corrupt, b"not a pdf").unwrap();
+        let error = run_pdf_engine(
+            &to_docx,
+            "pdf-to-docx",
+            &corrupt,
+            &dir.path().join("x.docx"),
+        )
+        .unwrap_err();
+        assert_eq!(error.code, ErrorCode::InvalidPdf);
+
+        let legacy = dir.path().join("antiguo.doc");
+        fs::write(&legacy, b"\xd0\xcf\x11\xe0 legacy").unwrap();
+        let error = convert(
+            legacy.to_str().unwrap(),
+            "pdf",
+            "docx-to-pdf",
+            Some(&to_pdf),
+            basic_docx_to_pdf,
+        )
+        .unwrap_err();
+        assert_eq!(error.code, ErrorCode::UnsupportedFormat);
+    }
+
+    #[test]
+    fn rejects_formats_other_than_docx_without_the_engine() {
+        let dir = tempfile::tempdir().unwrap();
+        for name in ["antiguo.doc", "texto.odt", "texto.rtf"] {
+            let path = dir.path().join(name);
+            fs::write(&path, b"x").unwrap();
+            let error = convert(
+                path.to_str().unwrap(),
+                "pdf",
+                "docx-to-pdf",
+                None,
+                basic_docx_to_pdf,
+            )
+            .unwrap_err();
+            assert_eq!(error.code, ErrorCode::UnsupportedFormat, "{name}");
+        }
+    }
 
     #[test]
     fn docx_round_trip_through_basic_converters() {
@@ -586,11 +745,5 @@ mod tests {
         assert!(lines.len() > 5);
         assert!(lines.iter().all(|line| text_width(line, 11.0) <= 467.0));
         assert_eq!(win_ansi("ñ€ 漢"), vec![0xF1, 0x80, b' ', b'?']);
-    }
-
-    #[test]
-    fn builds_file_urls() {
-        assert_eq!(file_url(Path::new("/tmp/a b")), "file:///tmp/a%20b");
-        assert_eq!(file_url(Path::new(r"C:\Temp\x")), "file:///C:/Temp/x");
     }
 }

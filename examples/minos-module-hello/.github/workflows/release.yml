@@ -1,0 +1,58 @@
+# Builds one package per system and attaches them to a GitHub Release.
+# To publish: bump `version` in minos-module.json, then push the tag `v<version>`.
+name: Release module
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        include:
+          - { runner: windows-latest, os: windows, binary: hello-backend.exe }
+          - { runner: macos-latest, os: macos, binary: hello-backend }
+          - { runner: ubuntu-latest, os: linux, binary: hello-backend }
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build the backend
+        run: cargo build --release --manifest-path backend/Cargo.toml
+
+      - name: Assemble the package
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          id="$(jq -r .id minos-module.json)"
+          test "$version" = "$(jq -r .version minos-module.json)"
+
+          mkdir -p dist/package/bin
+          cp minos-module.json dist/package/
+          cp -r ui dist/package/
+          cp "backend/target/release/${{ matrix.binary }}" dist/package/bin/
+
+          # The manifest must be at the root of the .zip.
+          name="$id-$version-${{ matrix.os }}.zip"
+          cd dist/package
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            7z a "../$name" .
+          else
+            zip -r "../$name" .
+          fi
+          echo "PACKAGE=dist/$name" >> "$GITHUB_ENV"
+
+      - name: Attach it to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes || true
+          gh release upload "$GITHUB_REF_NAME" "$PACKAGE" --clobber

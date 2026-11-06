@@ -1,0 +1,22 @@
+{
+  "id": "hello",
+  "version": "1.0.0",
+  "minosApi": 1,
+  "name": { "en": "Hello", "es": "Hola" },
+  "description": {
+    "en": "Example module to copy when creating your own.",
+    "es": "Módulo de ejemplo para copiar al crear el tuyo."
+  },
+  "author": "Minos contributors",
+  "category": "utilities",
+  "platforms": ["windows", "macos", "linux"],
+  "entry": "ui/index.html",
+  "icon": "ui/icon.svg",
+  "backend": {
+    "exec": {
+      "windows": "bin/hello-backend.exe",
+      "macos": "bin/hello-backend",
+      "linux": "bin/hello-backend"
+    }
+  }
+}

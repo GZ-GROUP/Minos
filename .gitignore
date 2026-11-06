@@ -27,5 +27,8 @@ dist-ssr
 .env
 .env.*
 
+# Python
+__pycache__/
+
 # Personal Claude Code settings
 .claude/settings.local.json

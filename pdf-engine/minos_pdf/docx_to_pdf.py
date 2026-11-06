@@ -17,6 +17,7 @@ from docx.opc.exceptions import PackageNotFoundError
 from lxml import etree
 
 from minos_pdf import EngineError
+from minos_pdf.bundle import use_bundled_libraries
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 NS = {
@@ -1402,6 +1403,7 @@ def build_html(source: str) -> str:
 
 
 def write_pdf(markup: str, output) -> None:
+    use_bundled_libraries()
     # Imported here because it needs Pango, which HTML generation doesn't.
     from weasyprint import HTML
     from weasyprint.urls import URLFetcher

@@ -23,6 +23,8 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_DIST = ROOT.parent / "src-tauri" / "pdf-engine-dist"
 # Pulled in by dependencies but never reached by the conversions.
 EXCLUDES = ["tkinter", "matplotlib", "pytest", "IPython", "scipy", "pandas", "fire"]
+# What WeasyPrint loads at run time, which has to be inside the bundle on every system.
+REQUIRED_LIBRARIES = ["gobject-2.0", "pango-1.0", "pangoft2-1.0", "harfbuzz", "fontconfig"]
 
 
 def smoke_test(bundle: Path) -> None:
@@ -90,10 +92,16 @@ def main() -> None:
                 f"--workpath={work}",
                 f"--specpath={work}",
                 *(f"--exclude-module={name}" for name in EXCLUDES),
+                *(f"--add-data={ROOT / 'minos_pdf' / name}{os.pathsep}minos_pdf"
+                  for name in ("fonts-windows.conf", "fonts-posix.conf")),
             ]
         )
 
     bundle = args.dist / "minos-pdf"
+    # The conversion test alone wouldn't notice: it could be finding this machine's copies.
+    for library in REQUIRED_LIBRARIES:
+        if not any(library in path.name for path in (bundle / "_internal").iterdir()):
+            raise SystemExit(f"The engine bundle is missing {library}. Is Pango where the linker can find it?")
     # OpenCV's video codecs: about 30 MB that pdf2docx's image handling never loads.
     for codec in bundle.rglob("opencv_videoio_ffmpeg*"):
         codec.unlink()

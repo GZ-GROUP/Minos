@@ -14,7 +14,7 @@ import "./OfficeConverter.css";
 
 interface ConversionResult {
   file: SelectedFile;
-  engine: "libreoffice" | "basic";
+  engine: "minos" | "basic";
 }
 
 interface OfficeConverterProps {
@@ -37,7 +37,7 @@ export function OfficeConverter({
 }: OfficeConverterProps) {
   const { t } = useTranslation();
   const { alert } = useDialogs();
-  const engine = useCommand<{ libreoffice: boolean }>("convert_engine");
+  const engine = useCommand<{ pdfEngine: boolean }>("convert_engine");
   const [input, setInput] = useState<SelectedFile | null>(null);
   const [result, setResult] = useState<ConversionResult | null>(null);
   const [busy, setBusy] = useState(false);
@@ -62,13 +62,12 @@ export function OfficeConverter({
     }
   };
 
-  const hasLibreOffice = engine.data?.libreoffice;
-  const notice = engine.data && (
+  const hasFullEngine = engine.data?.pdfEngine;
+  // Only speaks up when something is wrong: the result would lose its formatting.
+  const notice = engine.data && !hasFullEngine && (
     <div className="office-converter__engine">
-      <StatusPill tone={hasLibreOffice ? "success" : "warning"}>
-        {hasLibreOffice ? t("convert.libreoffice") : t("convert.basic")}
-      </StatusPill>
-      <p className="office-converter__hint">{hasLibreOffice ? t("convert.libreofficeHint") : t("convert.basicHint")}</p>
+      <StatusPill tone="warning">{t("convert.basic")}</StatusPill>
+      <p className="office-converter__hint">{t("convert.basicHint")}</p>
     </div>
   );
 
@@ -91,7 +90,7 @@ export function OfficeConverter({
       output={
         <>
           <FileSelector size="lg" mode="download" file={result?.file ?? null} filters={outputFilters} busy={busy} />
-          {result?.engine === "basic" && hasLibreOffice && (
+          {result?.engine === "basic" && hasFullEngine && (
             <p className="office-converter__hint">{t("convert.usedBasic")}</p>
           )}
         </>

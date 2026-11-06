@@ -6,7 +6,7 @@ export default function WordToPdf() {
   return (
     <OfficeConverter
       command="convert_word_to_pdf"
-      inputFilters={[{ name: "Word", extensions: ["docx", "doc", "odt", "rtf"] }]}
+      inputFilters={[{ name: "Word", extensions: ["docx"] }]}
       outputFilters={[{ name: "PDF", extensions: ["pdf"] }]}
       inputPlaceholder={t("choose")}
       actionLabel={t("convert")}

@@ -1,0 +1,6 @@
+# Runtime dependencies of the PDF engine.
+pdf2docx==0.5.13
+# 1.28.x is the newest line without the ML layout stack (onnxruntime, etc.) pulled in by 2.x.
+pymupdf==1.28.2
+python-docx==1.2.0
+weasyprint==70.0

@@ -1,6 +1,7 @@
 import re
 from urllib.request import OpenerDirector
 
+import pymupdf
 import pytest
 from pypdf import PdfReader
 
@@ -406,14 +407,16 @@ def test_number_formats(value, fmt, expected):
 def test_renders_a_pdf(rich_docx, tmp_path, needs_pango):
     output = tmp_path / "out.pdf"
     convert(str(rich_docx), str(output))
-    reader = PdfReader(output)
-    assert len(reader.pages) == 2
-    first = reader.pages[0].extract_text()
-    assert "Título principal" in first
-    assert "Señor" in first
-    assert "Encabezado del informe" in first
-    assert reader.pages[0].images
-    assert "2" in reader.pages[1].extract_text()
+    # Not pypdf: where no font has the CJK text of this document, which is usual on Linux,
+    # it garbles the whole page. PyMuPDF and PDFium (Chrome, Edge) read that PDF fine.
+    with pymupdf.open(output) as pdf:
+        assert pdf.page_count == 2
+        first = pdf[0].get_text()
+        assert "Título principal" in first
+        assert "Señor" in first
+        assert "Encabezado del informe" in first
+        assert pdf[0].get_images()
+        assert "2" in pdf[1].get_text()
 
 
 @pytest.mark.parametrize("font", ["Cambria", "Arial", "Calibri", "Times New Roman"])
@@ -428,8 +431,6 @@ def test_accents_survive_in_the_text_layer(font, tmp_path, needs_pango):
 
 
 def test_justified_text_is_really_justified(tmp_path, needs_pango):
-    import pymupdf
-
     document = Document()
     paragraph = document.add_paragraph("palabra " * 60)
     paragraph._p.get_or_add_pPr().append(

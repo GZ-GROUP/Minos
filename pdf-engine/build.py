@@ -9,6 +9,7 @@ The bundle is for the machine that builds it: PyInstaller can't cross-compile.
 """
 
 import argparse
+import ctypes
 import json
 import os
 import subprocess
@@ -25,6 +26,21 @@ DEFAULT_DIST = ROOT.parent / "src-tauri" / "pdf-engine-dist"
 EXCLUDES = ["tkinter", "matplotlib", "pytest", "IPython", "scipy", "pandas", "fire"]
 # What WeasyPrint loads at run time, which has to be inside the bundle on every system.
 REQUIRED_LIBRARIES = ["gobject-2.0", "pango-1.0", "pangoft2-1.0", "harfbuzz", "fontconfig"]
+
+
+def library_report(bundle: Path) -> str:
+    """Why a bundled library won't load, which WeasyPrint's own error doesn't say: it only
+    reports the first name it tried."""
+    lines = []
+    for library in REQUIRED_LIBRARIES:
+        for path in sorted((bundle / "_internal").glob(f"*{library}*")):
+            try:
+                ctypes.CDLL(str(path))
+                status = "loads"
+            except OSError as error:
+                status = f"FAILS: {error}"
+            lines.append(f"{path.name} ({'link' if path.is_symlink() else 'file'}): {status}")
+    return "\n".join(lines)
 
 
 def smoke_test(bundle: Path) -> None:
@@ -53,7 +69,7 @@ def smoke_test(bundle: Path) -> None:
         lines = result.stdout.strip().splitlines()
         report = json.loads(lines[-1]) if lines else {}
         if not report.get("ok") or not output.is_file():
-            raise SystemExit(f"The engine bundle can't do {command}: {result.stdout}\n{result.stderr}")
+            raise SystemExit(f"The engine bundle can't do {command}: {result.stdout}\n{result.stderr}\n{library_report(bundle)}")
 
     with tempfile.TemporaryDirectory() as work:
         folder = Path(work)
